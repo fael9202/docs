@@ -1,0 +1,121 @@
+---
+title: 'Webhook de Cash-out'
+description: 'Documentação completa das notificações do webhook para transações de cash-out'
+icon: 'webhook'
+---
+
+# Documentação do Webhook de Cash-in
+
+## Visão Geral
+Nosso sistema de webhook envia notificações em tempo real sobre transações de cash-out. Quando o status de uma transação é alterado, uma requisição POST é enviada para a URL configurada com informações detalhadas da transação.
+
+## Payload do Webhook
+O webhook envia um payload JSON contendo os detalhes e status da transação.
+
+### Exemplo de Payload
+```json
+{
+  "transactionId": "550e8400-e29b-41d4-a716-446655440000",
+  "transactionStatus": "PAID",
+  "transactionType": "CASH_OUT",
+  "value": 100.00,
+  "externalId": "pedido_123456",
+  "creditorAccount": {
+    "name": "João Silva",
+    "document": "123.456.789-00",
+    "accountType": "CHECKING"
+  },
+  "e2e_id": "E12345678202403151234567890"
+}
+```
+
+### Descrição dos Campos
+
+#### Informações da Transação
+- `transactionId` (string): Identificador único da transação no formato UUID
+- `transactionStatus` (string): Status atual da transação. Valores possíveis:
+  - `PAID`: Transação concluída com sucesso
+  - `FAILED`: Transação falhou
+  - `CHARGEBACK`: Transação estornada
+- `transactionType` (string): Tipo da transação, sempre "CASH_OUT"
+- `value` (number): Valor da transação
+- `externalId` (string): ID de referência externa fornecido pelo cliente
+- `error_message` (string, opcional): Mensagem de erro quando a transação falha ou é estornada
+- `creditorAccount` (objeto, opcional): Informações da conta do beneficiário quando a transação é bem-sucedida
+  - `name` (string): Nome do beneficiário
+  - `document` (string): Documento do beneficiário
+  - `accountType` (string): Tipo da conta
+- `e2e_id` (string, opcional): Identificador único da transação PIX
+
+### Exemplos por Status
+
+#### Transação Bem-sucedida
+```json
+{
+  "transactionId": "840dd376-2974-4a39-b2c9-48eb6e17698c",
+  "transactionStatus": "PAID",
+  "transactionType": "CASH_OUT",
+  "value": "1.7",
+  "externalId": "T&stess373",
+  "creditorAccount": {
+    "name": "JOAO DA SILVA",
+    "document": "145.***.***-99",
+    "bankCode": "077",
+    "bankName": "BANCO INTER",
+    "bankIspb": "00416968",
+    "accountType": "CACC"
+  },
+  "e2e_id": "E08253539202502101337205246cd3db"
+}
+```
+
+#### Transação Falha
+```json
+{
+  "transactionId": "550e8400-e29b-41d4-a716-446655440000",
+  "transactionStatus": "FAILED",
+  "transactionType": "CASH_OUT",
+  "value": 10,
+  "externalId": "pedido_123456",
+  "error_message": "Saldo insuficiente"
+}
+```
+
+#### Transação Estornada
+```json
+{
+  "transactionId": "550e8400-e29b-41d4-a716-446655440000",
+  "transactionStatus": "CHARGEBACK",
+  "transactionType": "CASH_OUT",
+  "value": 10,
+  "externalId": "pedido_123456",
+  "error_message": "REFUNDED"
+}
+```
+
+## Boas Práticas
+
+import { Steps } from 'nextra/components'
+
+<Steps>
+Confirme o recebimento do webhook com uma resposta 200 OK
+
+Implemente verificações de idempotência usando o `transactionId` e `externalId`
+
+Processe webhooks de forma assíncrona
+
+Mantenha logs dos webhooks recebidos para resolução de problemas
+
+Implemente lógica de retry para entregas de webhook falhas
+</Steps>
+
+## O Webhook deve retornar Status Code 200
+
+<Warning>
+  Para que a transação tenha seu fluxo finalizado com Sucesso é de extrema importancia que seja retornado 200 na resposta!
+</Warning>
+
+
+export default function MDXPage({ children }) {
+  return <div className="docs-container">{children}</div>;
+}

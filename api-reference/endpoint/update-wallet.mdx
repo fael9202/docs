@@ -1,0 +1,73 @@
+---
+title: "Atualizar Carteira"
+openapi: 'PUT /exchange/wallets/{address}'
+description: "Atualiza os dados de uma carteira cripto existente"
+---
+
+## Visão Geral
+
+Atualiza os dados de uma carteira cripto existente. Atualmente, apenas o nome da carteira pode ser atualizado.
+
+## Parâmetros
+
+<ParamField path="path" type="object">
+  <ParamField path="address" type="string" required>
+    Endereço da carteira cripto
+  </ParamField>
+</ParamField>
+
+<ParamField path="query" type="object">
+  <ParamField path="network" type="string" required>
+    Rede da criptomoeda (ex: "polygon", "polygon_amoy", "ethereum", "tron")
+  </ParamField>
+</ParamField>
+
+<ParamField path="body" type="object">
+  <Expandable title="UpdateWalletDto">
+
+    <ParamField path="name" type="string">
+      Novo nome para a carteira
+    </ParamField>
+
+    <ParamField path="address" type="string">
+      Endereço da Carteira
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="address" type="string">
+    Endereço da carteira cripto
+  </ResponseField>
+
+  <ResponseField name="network" type="string">
+    Rede da criptomoeda
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Nome da carteira
+  </ResponseField>
+
+  <ResponseField name="status" type="string">
+    Status da carteira
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string" format="date-time">
+    Data de criação da carteira
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string" format="date-time">
+    Data da última atualização
+  </ResponseField>
+</ResponseField>

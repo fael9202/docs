@@ -1,0 +1,75 @@
+---
+title: 'Webhook de Cash-in'
+description: 'Documentação completa das notificações do webhook para transações de cash-in'
+icon: 'webhook'
+---
+
+# Documentação do Webhook de Cash-in
+
+## Visão Geral
+Nosso sistema de webhook envia notificações em tempo real sobre transações de cash-in. Quando o status de uma transação é alterado, uma requisição POST é enviada para a URL configurada com informações detalhadas da transação.
+
+## Payload do Webhook
+O webhook envia um payload JSON contendo os detalhes e status da transação.
+
+### Exemplo de Payload
+```json
+{
+  "transactionId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "transactionStatus": "PAID", 
+  "transactionType": "CASH_IN",
+  "value": "100.00",
+  "externalId": "pedido_123456",
+  "e2e_id": "Exxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "debtorAccount": {
+    "name": "João da Silva",
+    "document": "123.***.***-00",
+    "accountType": "TRAN"
+  }
+}
+```
+
+### Descrição dos Campos
+
+#### Informações da Transação
+- `transactionId` (string): Identificador único da transação no formato UUID
+- `transactionStatus` (string): Status atual da transação. Valores possíveis:
+  - `PAID`: Transação concluída com sucesso
+- `transactionType` (string): Tipo da transação, neste caso "CASH_IN"
+- `value` (string): Valor da transação
+- `externalId` (string): ID de referência externa fornecido pelo cliente
+- `e2e_id` (string): Identificador fim-a-fim da transação
+
+#### Informações da Conta do Pagador
+- `debtorAccount` (objeto): Informações sobre a conta que está enviando o dinheiro
+  - `name` (string): Nome completo do titular da conta
+  - `document` (string): Número do documento (CPF) parcialmente mascarado
+  - `accountType` (string): Tipo de conta, ex: "TRAN" para conta transacional
+
+
+## Boas Práticas
+
+import { Steps } from 'nextra/components'
+
+<Steps>
+Confirme o recebimento do webhook com uma resposta 200 OK
+
+Implemente verificações de idempotência usando o `transactionId` e `externalId`
+
+Processe webhooks de forma assíncrona
+
+Mantenha logs dos webhooks recebidos para resolução de problemas
+
+Implemente lógica de retry para entregas de webhook falhas
+</Steps>
+
+## O Webhook deve retornar Status Code 200
+
+<Warning>
+  Para que a transação tenha seu fluxo finalizado com Sucesso é de extrema importancia que seja retornado 200 na resposta!
+</Warning>
+
+
+export default function MDXPage({ children }) {
+  return <div className="docs-container">{children}</div>;
+}

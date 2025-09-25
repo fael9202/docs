@@ -1,0 +1,93 @@
+---
+title: "Criar Cotação"
+openapi: 'POST /exchange/quote'
+description: "Cria uma cotação para conversão de BRL para criptomoeda"
+---
+
+## Visão Geral
+
+Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui informações sobre a taxa de conversão, valores e informações da carteira de destino.
+
+<Note>
+  A cotação tem um tempo de expiração limitado. Após a expiração, uma nova cotação deve ser solicitada.
+</Note>
+
+<Warning>
+  **IMPORTANTE:** A cotação tem validade de **5 minutos**. O valor/quantidade que será transferido para sua conta/carteira será baseado na cotação no momento que a 3X Change recebeu o PIX, sendo assim podem haver variações para mais ou menos.
+</Warning>
+
+## Parâmetros
+
+<ParamField path="body" type="object">
+  <Expandable title="QuoteRequestDto">
+
+    <ParamField path="network" type="string" required>
+      Rede da criptomoeda (ex: "ethereum", "tron", "polygon", "polygon_amoy")
+    </ParamField>
+
+    <ParamField path="token" type="string" required>
+      Token da criptomoeda (ex: "USDT", "USDC")
+    </ParamField>
+
+    <ParamField path="request_amount" type="number" required>
+      Valor em BRL para conversão
+    </ParamField>
+
+    <ParamField path="address" type="string" required>
+      Endereço da carteira cripto de destino
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="quote" type="object">
+    <ResponseField name="quotation" type="number">
+      Taxa de cotação
+    </ResponseField>
+
+    <ResponseField name="expires_at" type="number">
+      Timestamp de expiração da cotação
+    </ResponseField>
+
+    <ResponseField name="receiver_amount" type="number">
+      Quantidade de criptomoeda que será recebida
+    </ResponseField>
+
+    <ResponseField name="sender_amount" type="number">
+      Valor em BRL enviado
+    </ResponseField>
+  </ResponseField>
+
+  <ResponseField name="wallet" type="object">
+    <ResponseField name="address" type="string">
+      Endereço da carteira cripto
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Status da carteira
+    </ResponseField>
+
+    <ResponseField name="network" type="string">
+      Rede da criptomoeda
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Nome da carteira
+    </ResponseField>
+  </ResponseField>
+
+  <ResponseField name="token" type="string">
+    Token da criptomoeda
+  </ResponseField>
+</ResponseField>

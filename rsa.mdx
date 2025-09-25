@@ -1,0 +1,94 @@
+---
+title: 'Autenticação RSA'
+description: 'Aprenda a implementar autenticação segura com assinatura RSA'
+---
+
+## Assinatura RSA para CashOut
+
+A assinatura RSA é necessária **apenas** para operações de CashOut em nossa API. Ao realizar uma requisição de CashOut, você precisa:
+
+1. Gerar uma assinatura digital do payload (corpo) da requisição
+2. Enviar essa assinatura no header `signature` da requisição
+
+Este processo garante a autenticidade e integridade da transação de CashOut.
+
+## Como Funciona
+
+1. Você cria o payload da requisição de CashOut
+2. Gera uma assinatura digital desse payload usando sua chave privada RSA
+3. Envia a requisição para `/transaction/cash-out` incluindo:
+   - O payload no corpo da requisição
+   - A assinatura gerada no header `signature`
+
+<Note>
+A assinatura RSA é obrigatória **somente** para a rota de CashOut. Outras operações como CashIn e Checkout não requerem assinatura.
+</Note>
+
+## Gerando suas Chaves
+
+### 1. Gerar Chave Privada
+
+<AccordionGroup>
+  <Accordion icon="shield-check" title="Gerar Chave Privada">
+    
+    ### Para gerar sua chave privada RSA, siga os passos:
+
+    1. Abra o terminal/cmd
+    2. Navegue até o diretório onde deseja salvar as chaves
+    3. Execute o comando:
+
+    ```bash
+    openssl genrsa -out private.pem 2048
+    ```
+
+    Este comando irá gerar uma chave privada RSA de 2048 bits no arquivo private.pem
+
+    <Warning>
+      **Atenção: A Chave Privada não deve ser compartilhada**
+
+      - A Chave Privada deve ficar apenas no servidor do seu sistema
+      - Recomendamos manter a chave criptografada em ambiente seguro
+      - Ela será usada exclusivamente para gerar a assinatura do Body das requisições
+      - Em caso de vazamento, entre em contato imediatamente com nosso suporte
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+### 2. Gerar Chave Pública
+
+<AccordionGroup>
+  <Accordion icon="shield-check" title="Gerar Chave Pública">
+    
+    ### Para gerar sua chave pública RSA a partir da chave privada:
+
+    1. No mesmo diretório da chave privada, execute:
+    ```bash
+    openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+    ```
+
+    2. Após gerar a chave pública, você deve enviá-la para validação através do email:
+    **development@3xbank.co**
+
+    3. No email, inclua:
+      - Sua chave pública (arquivo public.pem)
+      - Nome de usuário
+
+    <Note>
+      Após o envio, nossa equipe irá validar e vincular a chave pública à sua conta em até 24 horas úteis.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+## Exemplos de Implementação
+
+Para ajudar na integração, disponibilizamos repositórios com exemplos de como implementar a assinatura RSA em diferentes linguagens:
+
+- [Exemplo em Node.js](https://github.com/BeginsSoftwares/3X-Pay-rsa-node)
+- [Exemplo em PHP](https://github.com/BeginsSoftwares/3X-Pay-rsa-php) 
+- [Exemplo em Java](https://github.com/BeginsSoftwares/3X-Pay-rsa-java)
+
+<Note>
+Os exemplos incluem código para:
+- Criação da assinatura do payload
+- Validação da assinatura do payload
+</Note>

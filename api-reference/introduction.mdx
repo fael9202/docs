@@ -1,33 +1,42 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'Introdução'
+description: 'Documentação da API 3x Change'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  Para utilizar nossa API é necessário ter uma conta na plataforma 3x Change. 
+  Acesse https://app.3xchange.co para criar sua conta.
 </Note>
 
-## Welcome
+## Bem-vindo
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+A API da 3x Change permite que você integre facilmente a conversão de PIX para criptomoedas em sua aplicação. Com ela você pode criar carteiras cripto, consultar cotações, gerar pagamentos PIX e receber automaticamente as criptomoedas.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="3x Change API"
+  icon="credit-card"
+  href="https://api.3xchange.co"
 >
-  View the OpenAPI specification file
+  Endpoint base da API
 </Card>
 
-## Authentication
+## Autenticação
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Para autenticar as requisições à API, você precisa incluir duas chaves nos headers das requisições:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+- `api_key`
+- `api_secret`
+
+Essas credenciais são únicas para cada conta e podem ser encontradas no painel administrativo da 3x Change.
+
+<Card
+  title="Acessando Minhas Credenciais"
+  icon="key"
+  href="/authentication"
+>
+  Acesse suas credenciais de API no painel administrativo
+</Card>
+
+<Warning>
+  Mantenha suas credenciais em segurança e nunca as compartilhe. Em caso de comprometimento, revogue-as imediatamente no painel.
+</Warning>

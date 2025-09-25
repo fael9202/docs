@@ -1,0 +1,59 @@
+---
+title: "Obter Carteira"
+openapi: 'GET /exchange/wallets/{address}'
+description: "Obtém detalhes de uma carteira cripto específica"
+---
+
+## Visão Geral
+
+Retorna os detalhes de uma carteira cripto específica usando o endereço da carteira e opcionalmente filtrando por rede.
+
+## Parâmetros
+
+<ParamField path="path" type="object">
+  <ParamField path="address" type="string" required>
+    Endereço da carteira cripto
+  </ParamField>
+</ParamField>
+
+<ParamField path="query" type="object">
+  <ParamField path="network" type="string" required>
+    Filtro opcional por rede (ex: "polygon", "polygon_amoy", "ethereum", "tron")
+  </ParamField>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="address" type="string">
+    Endereço da carteira cripto
+  </ResponseField>
+
+  <ResponseField name="network" type="string">
+    Rede da criptomoeda
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Nome da carteira
+  </ResponseField>
+
+  <ResponseField name="status" type="string">
+    Status da carteira
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string" format="date-time">
+    Data de criação da carteira
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string" format="date-time">
+    Data da última atualização
+  </ResponseField>
+</ResponseField>

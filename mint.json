@@ -1,0 +1,66 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "3x Change API",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373",
+    "anchors": {
+      "from": "#0D9373",
+      "to": "#07C983"
+    }
+  },
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "https://app.3xchange.co"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Início",
+      "pages": [
+        "introduction",
+        "authentication",
+        "rsa"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": [
+        "api-reference/introduction"
+      ]
+    },
+    {
+      "group": "Carteiras Cripto",
+      "pages": [
+        "api-reference/endpoint/create-wallet",
+        "api-reference/endpoint/list-wallets",
+        "api-reference/endpoint/get-wallet",
+        "api-reference/endpoint/update-wallet"
+      ]
+    },
+    {
+      "group": "Cotações e Pagamentos",
+      "pages": [
+        "api-reference/endpoint/get-quote",
+        "api-reference/endpoint/create-payment"
+      ]
+    },
+    {
+      "group": "Webhooks",
+      "pages": [
+        "api-reference/webhook/webhook-payment"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+---
+title: "Criar Carteira"
+openapi: 'POST /exchange/wallets'
+description: "Cria uma nova carteira cripto para receber conversões de PIX"
+---
+
+## Visão Geral
+
+Cria uma nova carteira cripto associada à sua conta. A carteira será usada para receber automaticamente as criptomoedas após a confirmação de pagamentos PIX.
+
+<Note>
+  Cada carteira é única e está associada a uma rede específica (Bitcoin, Ethereum, etc.).
+</Note>
+
+## Parâmetros
+
+<ParamField path="body" type="object">
+  <Expandable title="CreateWalletDto">
+
+    <ParamField path="network" type="string" required>
+      Rede da criptomoeda (ex: "polygon", "polygon_amoy", "ethereum", "tron")
+    </ParamField>
+
+    <ParamField path="address" type="string" required>
+      Endereço da carteira cripto
+    </ParamField>
+
+    <ParamField path="name" type="string" required>
+      Nome da carteira (ex: "Minha Carteira Bitcoin")
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="address" type="string">
+    Endereço da carteira cripto
+  </ResponseField>
+
+  <ResponseField name="network" type="string">
+    Rede da criptomoeda
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Nome da carteira
+  </ResponseField>
+
+  <ResponseField name="status" type="string">
+    Status da carteira
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string" format="date-time">
+    Data de criação da carteira
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string" format="date-time">
+    Data da última atualização
+  </ResponseField>
+</ResponseField>
+

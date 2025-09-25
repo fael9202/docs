@@ -1,0 +1,58 @@
+---
+title: "Criar Pagamento"
+openapi: 'POST /exchange/payment'
+description: "Cria um pagamento PIX baseado em uma cotação existente"
+---
+
+## Visão Geral
+
+Cria um pagamento PIX baseado em uma cotação previamente gerada. Este endpoint gera um código PIX que deve ser usado para realizar o pagamento e completar a conversão para criptomoeda.
+
+<Note>
+  É necessário ter uma cotação válida antes de criar o pagamento. Use o endpoint de cotação primeiro.
+</Note>
+
+<Warning>
+  **IMPORTANTE:** O pagamento deve ser realizado dentro do prazo de validade da cotação (5 minutos). Após o pagamento, a criptomoeda será enviada automaticamente para a carteira especificada na cotação.
+</Warning>
+
+## Parâmetros
+
+<ParamField path="body" type="object">
+  <Expandable title="CreatePaymentDto">
+
+    <ParamField path="quote_id" type="string" required>
+      ID da cotação para criar o pagamento
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="value" type="number">
+    Valor do pagamento em BRL
+  </ResponseField>
+
+  <ResponseField name="payment_code" type="string">
+    Código do pagamento PIX
+  </ResponseField>
+
+  <ResponseField name="quote_id" type="string">
+    ID da cotação utilizada
+  </ResponseField>
+
+  <ResponseField name="transaction_id" type="string">
+    ID da transação gerada
+  </ResponseField>
+</ResponseField>
+

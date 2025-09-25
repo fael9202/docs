@@ -1,0 +1,104 @@
+---
+title: 'Webhook de Infração'
+description: 'Documentação completa das notificações do webhook para infrações em transações'
+icon: 'webhook'
+---
+
+# Documentação do Webhook de Infração
+
+## Visão Geral
+Nosso sistema de webhook envia notificações em tempo real sobre infrações detectadas em transações. Quando uma infração é identificada, uma requisição POST é enviada para a URL configurada com informações detalhadas da ocorrência.
+
+## Payload do Webhook
+O webhook envia um payload JSON contendo os detalhes da infração e da transação relacionada.
+
+### Exemplo de Payload
+```json
+{
+  "transactionId": "5a94d48d-c9f3-46be-8448-83510ca42bde",
+  "transactionStatus": "MED",
+  "transactionType": "CASH_IN",
+  "value": 18,
+  "externalId": "T&ste378",
+  "e2e_id": "E082535392025011818245238600338f",
+  "medStatus": "ACKNOWLEDGED"
+}
+```
+
+### Descrição dos Campos
+
+#### Informações da Transação
+- `transactionId` (string): Identificador único da transação no formato UUID
+- `transactionStatus` (string): Status atual da transação. Valores possíveis:
+  - `MED`: Transação solicitada MED
+- `transactionType` (string): Tipo da transação, neste caso "CASH_IN"
+- `value` (string): Valor da transação
+- `externalId` (string): ID de referência externa fornecido pelo cliente
+- `medStatus` (string): Status do MED. Valores possíveis:
+  - `ACKNOWLEDGED`: Quando a solicitação do MED é recebida
+  - `CANCELLED`: Quando o MED é cancelado e o valor estornado para conta
+  - `DEBITED`:  Quando a defesa do MED não é aceita e o valor enviado para o cliente.
+
+## Boas Práticas
+
+import { Steps } from 'nextra/components'
+
+<Steps>
+Confirme o recebimento do webhook com uma resposta 200 OK
+
+Implemente verificações de idempotência usando o `transactionId` e `externalId`
+
+Processe webhooks de forma assíncrona
+
+Mantenha logs dos webhooks recebidos para resolução de problemas
+
+Implemente lógica de retry para entregas de webhook falhas
+</Steps>
+
+## O Webhook deve retornar Status Code 200
+
+<Warning>
+  Para que a transação tenha seu fluxo finalizado com Sucesso é de extrema importancia que seja retornado 200 na resposta!
+</Warning>
+
+## Consulta de Comprovante
+
+### Endpoint
+```http
+GET /transaction/{transactionId}/receipt
+```
+
+### Parâmetros do Path
+- `transactionId` (string): Identificador único da transação no formato UUID
+
+### Exemplo de Requisição
+```http
+GET /transaction/b6e0ee4e-b3a3-4042-ac4d-fba92ebd96a5/receipt
+```
+
+### Resposta de Sucesso
+- **Status Code:** 200 OK
+
+```json
+{
+    "status": "SUCCESS",
+    "data": {
+        "receipt": "JVBERi0xLjMKJf.....", // String em base64 do arquivo PDF
+        "mimeType": "application/pdf"
+    }
+}
+```
+
+### Descrição dos Campos da Resposta
+- `status` (string): Status da requisição
+- `data` (object): Objeto contendo os dados do comprovante
+  - `receipt` (string): Conteúdo do comprovante em formato base64
+  - `mimeType` (string): Tipo do arquivo do comprovante (application/pdf)
+
+### Observações
+- O campo `receipt` contém o arquivo PDF codificado em base64
+- Para visualizar o comprovante, é necessário decodificar o conteúdo base64 para PDF
+
+export default function MDXPage({ children }) {
+  return <div className="docs-container">{children}</div>;
+}

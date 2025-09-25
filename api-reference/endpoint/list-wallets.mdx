@@ -1,0 +1,53 @@
+---
+title: "Listar Carteiras"
+openapi: 'GET /exchange/wallets'
+description: "Lista todas as carteiras cripto da sua conta"
+---
+
+## Visão Geral
+
+Retorna uma lista de todas as carteiras cripto associadas à sua conta. Você pode filtrar por rede específica usando o parâmetro de query.
+
+## Parâmetros
+
+<ParamField path="query" type="object">
+  <ParamField path="network" type="string">
+    Filtro opcional por rede (ex: "polygon", "polygon_amoy", "ethereum", "tron")
+  </ParamField>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva da operação
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  <ResponseField name="address" type="string">
+    Endereço da carteira cripto
+  </ResponseField>
+
+  <ResponseField name="network" type="string">
+    Rede da criptomoeda
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Nome da carteira
+  </ResponseField>
+
+  <ResponseField name="status" type="string">
+    Status da carteira
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string" format="date-time">
+    Data de criação da carteira
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string" format="date-time">
+    Data da última atualização
+  </ResponseField>
+</ResponseField>

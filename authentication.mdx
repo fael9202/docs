@@ -1,0 +1,56 @@
+---
+title: 'Credenciais de API'
+description: 'Aprenda como gerar e gerenciar suas credenciais de API de forma segura'
+---
+
+## Gerando suas Credenciais
+
+Para começar a integração com nossa API, você precisará gerar suas credenciais de acesso. Siga os passos abaixo com atenção.
+
+### 1. Cadastro de Dispositivo de Confiança
+
+<AccordionGroup>
+  <Accordion icon="shield-check" title="Adicione um dispositivo">
+    <img src="/images/add-device.png" alt="Tela de adição de dispositivo" />
+    
+    Para maior segurança, é necessário primeiro cadastrar o dispositivo que será usado para gerar as credenciais:
+
+    1. Acesse o [Dashboard](https://app.3xpay.co)
+    2. No menu lateral, clique em "Configurações" > "Aparelho de confiança"
+    3. Leia o QRCode pelo seu gerenciador de 2FA
+    4. Confirme a operação via autenticação de dois fatores
+  </Accordion>
+</AccordionGroup>
+
+### 2. Geração das Chaves de API
+
+<AccordionGroup>
+  <Accordion icon="key" title="Gere suas chaves">
+    <img src="/images/generate-keys.png" alt="Tela de geração de chaves" />
+    
+    Com o dispositivo cadastrado, você pode gerar suas chaves de API:
+
+    1. No menu lateral, acesse "Integrações" > "Credenciais de API" 
+    2. Insira o 2FA
+    3. Copie as chaves geradas
+    4. Guarde as chaves de API em locais seguros.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Atenção: Mantenha suas credenciais seguras**
+
+  - As chaves de API dão acesso direto à sua conta
+  - Nunca compartilhe suas credenciais com terceiros
+  - Armazene as chaves de forma segura
+  - Você é responsável por qualquer uso das suas credenciais
+  - Em caso de vazamento, revogue imediatamente as chaves comprometidas
+</Warning>
+
+<Card title="Próximos Passos" icon="arrow-right">
+  Com suas credenciais em mãos, você já pode começar a integração. Consulte nossa documentação de endpoints para mais detalhes:
+  
+  - [Autenticação](/api-reference/authentication)
+  - [Endpoints de Cash-in](/api-reference/cash-in)
+  - [Endpoints de Cash-out](/api-reference/cash-out)
+</Card>

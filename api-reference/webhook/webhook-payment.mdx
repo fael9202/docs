@@ -1,0 +1,210 @@
+---
+title: "Webhook de Pagamento"
+description: "Notificações em tempo real sobre o status dos pagamentos PIX"
+---
+
+## Visão Geral
+
+Os webhooks permitem que você receba notificações em tempo real sobre mudanças no status dos pagamentos PIX. Quando o status de um pagamento muda, nossa API enviará uma requisição POST para a URL configurada.
+
+## Configuração
+
+Para receber webhooks, configure a URL no momento da criação do pagamento PIX:
+
+```json
+{
+  "walletAddress": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "network": "bitcoin",
+  "amount": 100.00,
+  "webhookUrl": "https://meusite.com/webhook/pix-payment"
+}
+```
+
+## Estrutura do Webhook
+
+### Headers
+
+<ParamField path="headers" type="object">
+  <ParamField path="Content-Type" type="string">
+    "application/json"
+  </ParamField>
+  <ParamField path="X-3X-Signature" type="string">
+    Assinatura HMAC-SHA256 para validação
+  </ParamField>
+  <ParamField path="X-3X-Timestamp" type="string">
+    Timestamp Unix da requisição
+  </ParamField>
+</ParamField>
+
+### Corpo da Requisição
+
+<ResponseField name="id" type="string">
+  ID único do pagamento PIX
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Novo status do pagamento
+</ResponseField>
+
+<ResponseField name="walletAddress" type="string">
+  Endereço da carteira cripto de destino
+</ResponseField>
+
+<ResponseField name="network" type="string">
+  Rede da criptomoeda
+</ResponseField>
+
+<ResponseField name="amount" type="number">
+  Valor em BRL
+</ResponseField>
+
+<ResponseField name="cryptoAmount" type="number">
+  Quantidade de criptomoeda enviada
+</ResponseField>
+
+<ResponseField name="cryptoTransactionHash" type="string">
+  Hash da transação cripto (quando status = paid)
+</ResponseField>
+
+<ResponseField name="paidAt" type="string" format="date-time">
+  Data de confirmação do pagamento (quando status = paid)
+</ResponseField>
+
+<ResponseField name="timestamp" type="string" format="date-time">
+  Timestamp da notificação
+</ResponseField>
+
+## Exemplo de Webhook
+
+### Pagamento Confirmado
+
+```json
+{
+  "id": "pix_123456789",
+  "status": "paid",
+  "walletAddress": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "network": "bitcoin",
+  "amount": 100.00,
+  "cryptoAmount": 0.0004,
+  "cryptoTransactionHash": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+  "paidAt": "2024-01-15T11:15:00Z",
+  "timestamp": "2024-01-15T11:15:05Z"
+}
+```
+
+### Pagamento Expirado
+
+```json
+{
+  "id": "pix_123456789",
+  "status": "expired",
+  "walletAddress": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "network": "bitcoin",
+  "amount": 100.00,
+  "cryptoAmount": 0.0004,
+  "cryptoTransactionHash": null,
+  "paidAt": null,
+  "timestamp": "2024-01-15T11:30:05Z"
+}
+```
+
+## Validação da Assinatura
+
+Para garantir a autenticidade do webhook, valide a assinatura HMAC-SHA256:
+
+<CodeGroup>
+
+```javascript JavaScript
+const crypto = require('crypto');
+
+function validateWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature, 'hex'),
+    Buffer.from(expectedSignature, 'hex')
+  );
+}
+
+// Exemplo de uso
+app.post('/webhook/pix-payment', (req, res) => {
+  const signature = req.headers['x-3x-signature'];
+  const payload = JSON.stringify(req.body);
+  
+  if (validateWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
+    // Processar webhook
+    console.log('Webhook válido:', req.body);
+    res.status(200).send('OK');
+  } else {
+    res.status(401).send('Assinatura inválida');
+  }
+});
+```
+
+```python Python
+import hmac
+import hashlib
+import json
+
+def validate_webhook_signature(payload, signature, secret):
+    expected_signature = hmac.new(
+        secret.encode('utf-8'),
+        payload.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(signature, expected_signature)
+
+# Exemplo de uso com Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhook/pix-payment', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-3X-Signature')
+    payload = json.dumps(request.json)
+    
+    if validate_webhook_signature(payload, signature, os.environ['WEBHOOK_SECRET']):
+        # Processar webhook
+        print('Webhook válido:', request.json)
+        return 'OK', 200
+    else:
+        return 'Assinatura inválida', 401
+```
+
+</CodeGroup>
+
+## Resposta Esperada
+
+Sua aplicação deve responder com status `200 OK` para indicar que o webhook foi processado com sucesso. Se não recebermos uma resposta `200` dentro de 30 segundos, tentaremos reenviar o webhook.
+
+## Tentativas de Reenvio
+
+- **Primeira tentativa**: Imediatamente após o evento
+- **Segunda tentativa**: 5 minutos depois
+- **Terceira tentativa**: 15 minutos depois
+- **Quarta tentativa**: 1 hora depois
+
+Após 4 tentativas sem sucesso, o webhook será descartado.
+
+## Códigos de Status
+
+<ResponseField name="200" type="string">
+  Webhook processado com sucesso
+</ResponseField>
+
+<ResponseField name="400" type="string">
+  Erro na estrutura do webhook
+</ResponseField>
+
+<ResponseField name="401" type="string">
+  Assinatura inválida
+</ResponseField>
+
+<ResponseField name="500" type="string">
+  Erro interno do servidor
+</ResponseField>
