@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-        "url": "https://api.3xchange.co"
+        "url": "https://gateway.3xpay.co"
     }
   ],
   "tags": [
