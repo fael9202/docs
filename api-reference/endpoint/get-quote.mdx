@@ -6,7 +6,7 @@ description: "Cria uma cotação para conversão de BRL para criptomoeda"
 
 ## Visão Geral
 
-Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui informações sobre a taxa de conversão, valores e informações da carteira de destino.
+Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui informações sobre a taxa de conversão, valores e informações da carteira de destino. O campo `currency_type` determina se o `request_amount` se refere ao valor enviado pelo pagador (`sender`) ou ao valor que o recebedor deve receber (`receiver`).
 
 <Note>
   A cotação tem um tempo de expiração limitado. Após a expiração, uma nova cotação deve ser solicitada.
@@ -30,11 +30,15 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
     </ParamField>
 
     <ParamField path="request_amount" type="number" required>
-      Valor em BRL para conversão
+      Valor usado no cálculo da cotação (interpretado conforme `currency_type`)
     </ParamField>
 
     <ParamField path="address" type="string" required>
       Endereço da carteira cripto de destino
+    </ParamField>
+
+    <ParamField path="currency_type" type="string" required>
+      Define se o `request_amount` é o valor enviado pelo pagador (`sender`) ou o valor que o recebedor deve receber (`receiver`).
     </ParamField>
 
   </Expandable>
@@ -52,12 +56,24 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
 
 <ResponseField name="data" type="object">
   <ResponseField name="quote" type="object">
+    <ResponseField name="quote_id" type="string">
+      Identificador da cotação
+    </ResponseField>
+
     <ResponseField name="quotation" type="number">
       Taxa de cotação
     </ResponseField>
 
+    <ResponseField name="commercial_quotation" type="number">
+      Taxa comercial aplicada
+    </ResponseField>
+
     <ResponseField name="expires_at" type="number">
       Timestamp de expiração da cotação
+    </ResponseField>
+
+    <ResponseField name="flat_fee" type="number">
+      Tarifa fixa aplicada
     </ResponseField>
 
     <ResponseField name="receiver_amount" type="number">
@@ -65,7 +81,15 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
     </ResponseField>
 
     <ResponseField name="sender_amount" type="number">
-      Valor em BRL enviado
+      Valor que o pagador envia
+    </ResponseField>
+
+    <ResponseField name="partner_fee_amount" type="number">
+      Valor de taxa do parceiro, quando aplicável
+    </ResponseField>
+
+    <ResponseField name="payin_quote_id" type="string">
+      Identificador de referência da cotação de entrada
     </ResponseField>
   </ResponseField>
 
@@ -91,3 +115,46 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
     Token da criptomoeda
   </ResponseField>
 </ResponseField>
+
+## Exemplo
+
+**Requisição**
+
+```json
+{
+  "network": "ethereum",
+  "token": "USDT",
+  "request_amount": 60,
+  "address": "0x7e4bb73735f7cc10c07f7b2541d695b79bd831a0",
+  "currency_type": "sender"
+}
+```
+
+**Resposta**
+
+```json
+{
+  "success": true,
+  "message": "Quote created successfully",
+  "data": {
+    "quote": {
+      "quote_id": "qu_4mqzgMfc8Jmg",
+      "quotation": 5.4521,
+      "commercial_quotation": 5.4169,
+      "expires_at": 1765542661121,
+      "flat_fee": 0.6,
+      "receiver_amount": 11.08,
+      "sender_amount": 63.64,
+      "partner_fee_amount": 0.05,
+      "payin_quote_id": "qu_4mqzgMfc8Jmg"
+    },
+    "wallet": {
+      "address": "0x7e4bb73735f7cc10c07f7b2541d695b79bd831a0",
+      "status": "ACTIVE",
+      "network": "ethereum",
+      "name": "teste blind"
+    },
+    "token": "USDT"
+  }
+}
+```

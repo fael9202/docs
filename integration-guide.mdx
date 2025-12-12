@@ -1,0 +1,173 @@
+---
+title: 'Guia de Integração'
+description: 'Guia detalhado para diferentes cenários de integração com a API da 3x Change'
+---
+
+## Cenários de Integração
+
+Este guia apresenta diferentes cenários de integração com a API da 3x Change, desde casos simples até implementações mais complexas.
+
+## Cenário 1: Depósito PIX para Cripto
+
+### Objetivo
+Permitir que usuários depositem via PIX e recebam automaticamente criptomoedas.
+
+### Implementação
+
+```javascript
+class CryptoDeposit {
+  constructor(api) {
+    this.api = api;
+    this.userWallets = new Map();
+  }
+
+  // Criar carteira para usuário
+  async createUserWallet(userId, currency) {
+    const wallet = await this.api.createWallet(
+      currency, 
+      `Depósito ${currency} - Usuário ${userId}`
+    );
+    
+    this.userWallets.set(`${userId}-${currency}`, wallet);
+    return wallet;
+  }
+
+  // Processar depósito PIX
+  async processDeposit(userId, amount, currency) {
+    const walletKey = `${userId}-${currency}`;
+    let wallet = this.userWallets.get(walletKey);
+    
+    if (!wallet) {
+      wallet = await this.createUserWallet(userId, currency);
+    }
+
+    // Criar pagamento PIX
+    const payment = await this.api.createPayment(
+      wallet.id,
+      amount,
+      'BRL'
+    );
+    
+    return payment;
+  }
+}
+
+// Exemplo de uso
+const deposit = new CryptoDeposit(api);
+
+// Processar depósito de R$ 100 em Bitcoin
+const payment = await deposit.processDeposit('user123', 100, 'BTC');
+console.log('PIX gerado:', payment.pix_key);
+```
+
+## Cenário 2: Gateway de Pagamento
+
+### Objetivo
+Criar um gateway que aceita pagamentos em reais e converte automaticamente para criptomoedas.
+
+### Implementação
+
+```javascript
+class CryptoPaymentGateway {
+  constructor(api) {
+    this.api = api;
+    this.merchants = new Map();
+  }
+
+  // Registrar merchant
+  async registerMerchant(merchantId, config) {
+    const wallets = await Promise.all(
+      config.currencies.map(currency => 
+        this.api.createWallet(currency, `Merchant ${merchantId} - ${currency}`)
+      )
+    );
+
+    this.merchants.set(merchantId, {
+      ...config,
+      wallets: wallets.reduce((acc, wallet) => {
+        acc[wallet.currency] = wallet;
+        return acc;
+      }, {})
+    });
+  }
+
+  // Processar pagamento
+  async processPayment(merchantId, amount, currency, customerInfo) {
+    const merchant = this.merchants.get(merchantId);
+    if (!merchant) {
+      throw new Error('Merchant não encontrado');
+    }
+
+    const wallet = merchant.wallets[currency];
+    if (!wallet) {
+      throw new Error('Moeda não suportada');
+    }
+
+    // Criar pagamento
+    const payment = await this.api.createPayment(
+      wallet.id,
+      amount,
+      'BRL'
+    );
+
+    // Notificar merchant
+    await this.notifyMerchant(merchantId, payment, customerInfo);
+
+    return {
+      paymentId: payment.id,
+      pixKey: payment.pix_key,
+      qrCode: payment.qr_code,
+      expiresAt: payment.expires_at
+    };
+  }
+
+  // Notificar merchant
+  async notifyMerchant(merchantId, payment, customerInfo) {
+    const merchant = this.merchants.get(merchantId);
+    
+    // Enviar webhook para o merchant
+    await fetch(merchant.webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'payment.created',
+        payment,
+        customer: customerInfo
+      })
+    });
+  }
+}
+```
+
+## Próximos Passos
+
+<CardGroup cols={2}>
+  <Card
+    title="Conceitos Fundamentais"
+    icon="book"
+    href="/concepts"
+  >
+    Entenda os termos e conceitos da API
+  </Card>
+  <Card
+    title="Início Rápido"
+    icon="rocket"
+    href="/quick-start"
+  >
+    Exemplo prático de integração
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="bell"
+    href="/api-reference/webhook/webhook-payment"
+  >
+    Configure notificações em tempo real
+  </Card>
+  <Card
+    title="API Reference"
+    icon="api"
+    href="/api-reference/introduction"
+  >
+    Documentação completa dos endpoints
+  </Card>
+</CardGroup>

@@ -1,75 +1,140 @@
 ---
 title: 'Webhook de Cash-in'
-description: 'Documentação completa das notificações do webhook para transações de cash-in'
+description: 'Notificações de entrada (payin) em tempo real'
 icon: 'webhook'
 ---
 
-# Documentação do Webhook de Cash-in
+# Webhook de Cash-in (Payin)
 
 ## Visão Geral
-Nosso sistema de webhook envia notificações em tempo real sobre transações de cash-in. Quando o status de uma transação é alterado, uma requisição POST é enviada para a URL configurada com informações detalhadas da transação.
+Enviamos webhooks para cada mudança de status do payin. Você receberá eventos sequenciais como `crypto.payin.new`, `crypto.payin.updated` e `crypto.payin.completed`, contendo detalhes do PIX, da cotação e da transferência on-chain.
 
-## Payload do Webhook
-O webhook envia um payload JSON contendo os detalhes e status da transação.
+## Estrutura do Payload
 
-### Exemplo de Payload
+- `event` (string): tipo do evento (`crypto.payin.new`, `crypto.payin.updated`, `crypto.payin.completed`).
+- `timestamp` (string, ISO 8601): momento em que o evento foi emitido.
+- `payin` (objeto): dados do payin.
+  - `external_id` (string): ID que você forneceu na criação do payin.
+  - `transaction_id` (number): ID interno.
+  - `status` (string): status atual (`processing`, `COMPLETED`).
+- `quote` (objeto): detalhes da cotação utilizada.
+  - `quote_id` (number): ID interno da cotação.
+  - `amount_brl` (number): valor em BRL.
+  - `amount_usd` (number): valor em USD/cripto equivalente.
+  - `rate` (number): taxa aplicada.
+  - `expires_at` (string, ISO 8601): expiração da cotação.
+- `pix` (objeto): informações do pagamento PIX.
+  - `pix_code` (string): código copia-e-cola.
+  - `txid` (string): txid do PIX.
+  - `status` (string): status do PIX (`processing`, `COMPLETED`).
+- `transfer` (objeto, presente a partir de `updated`):
+  - `tx_hash` (string|null): hash on-chain quando disponível.
+  - `network` (string|null): rede da transferência.
+  - `status` (string): status da transferência (`processing`, `completed`).
+
+## Exemplos de Eventos
+
+### crypto.payin.new
 ```json
 {
-  "transactionId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-  "transactionStatus": "PAID", 
-  "transactionType": "CASH_IN",
-  "value": "100.00",
-  "externalId": "pedido_123456",
-  "e2e_id": "Exxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "debtorAccount": {
-    "name": "João da Silva",
-    "document": "123.***.***-00",
-    "accountType": "TRAN"
+  "event": "crypto.payin.new",
+  "timestamp": "2025-12-12T12:59:30.737Z",
+  "payin": {
+    "external_id": "pi_nGM1ETJIVXKF",
+    "transaction_id": 84,
+    "status": "processing"
+  },
+  "quote": {
+    "quote_id": 278,
+    "amount_brl": 63.64,
+    "amount_usd": 11.09,
+    "rate": 5.4101,
+    "expires_at": "2025-12-12T13:04:14.658Z"
+  },
+  "pix": {
+    "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
+    "txid": "7b2f40d6166a4f339613bb568d00992d",
+    "status": "processing"
   }
 }
 ```
 
-### Descrição dos Campos
+### crypto.payin.updated
+```json
+{
+  "event": "crypto.payin.updated",
+  "timestamp": "2025-12-12T13:00:54.440Z",
+  "payin": {
+    "external_id": "pi_nGM1ETJIVXKF",
+    "transaction_id": 84,
+    "status": "processing"
+  },
+  "quote": {
+    "quote_id": 278,
+    "amount_brl": 63.64,
+    "amount_usd": 11.09,
+    "rate": 5.4101,
+    "expires_at": "2025-12-12T13:04:14.658Z"
+  },
+  "pix": {
+    "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
+    "txid": "7b2f40d6166a4f339613bb568d00992d",
+    "status": "processing"
+  },
+  "transfer": {
+    "tx_hash": null,
+    "network": null,
+    "status": "processing"
+  }
+}
+```
 
-#### Informações da Transação
-- `transactionId` (string): Identificador único da transação no formato UUID
-- `transactionStatus` (string): Status atual da transação. Valores possíveis:
-  - `PAID`: Transação concluída com sucesso
-- `transactionType` (string): Tipo da transação, neste caso "CASH_IN"
-- `value` (string): Valor da transação
-- `externalId` (string): ID de referência externa fornecido pelo cliente
-- `e2e_id` (string): Identificador fim-a-fim da transação
-
-#### Informações da Conta do Pagador
-- `debtorAccount` (objeto): Informações sobre a conta que está enviando o dinheiro
-  - `name` (string): Nome completo do titular da conta
-  - `document` (string): Número do documento (CPF) parcialmente mascarado
-  - `accountType` (string): Tipo de conta, ex: "TRAN" para conta transacional
-
+### crypto.payin.completed
+```json
+{
+  "event": "crypto.payin.completed",
+  "timestamp": "2025-12-12T13:01:00.289Z",
+  "payin": {
+    "external_id": "pi_nGM1ETJIVXKF",
+    "transaction_id": 84,
+    "status": "COMPLETED"
+  },
+  "quote": {
+    "quote_id": 278,
+    "amount_brl": 63.64,
+    "amount_usd": 11.09,
+    "rate": 5.4101,
+    "expires_at": "2025-12-12T13:04:14.658Z"
+  },
+  "pix": {
+    "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
+    "txid": "7b2f40d6166a4f339613bb568d00992d",
+    "status": "COMPLETED"
+  },
+  "transfer": {
+    "tx_hash": "0xba66b09814eddc93f037e09177be6b551d63dbc052ecce6bf161d09e07841388",
+    "network": null,
+    "status": "completed"
+  }
+}
+```
 
 ## Boas Práticas
 
 import { Steps } from 'nextra/components'
 
 <Steps>
-Confirme o recebimento do webhook com uma resposta 200 OK
+Responda 200 OK imediatamente (antes de processar) para evitar reentregas
 
-Implemente verificações de idempotência usando o `transactionId` e `externalId`
+Use `transaction_id` + `external_id` para idempotência
 
-Processe webhooks de forma assíncrona
+Processe de forma assíncrona e registre logs para auditoria
 
-Mantenha logs dos webhooks recebidos para resolução de problemas
-
-Implemente lógica de retry para entregas de webhook falhas
+Implemente retries próprios se alguma etapa interna falhar
 </Steps>
 
-## O Webhook deve retornar Status Code 200
+## Resposta Esperada
 
 <Warning>
-  Para que a transação tenha seu fluxo finalizado com Sucesso é de extrema importancia que seja retornado 200 na resposta!
+  Retorne **HTTP 200** para confirmar o recebimento; caso contrário, o webhook será reenviado conforme nossa política de retries.
 </Warning>
-
-
-export default function MDXPage({ children }) {
-  return <div className="docs-container">{children}</div>;
-}

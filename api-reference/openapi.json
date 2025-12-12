@@ -361,7 +361,7 @@
       },
       "QuoteRequestDto": {
         "type": "object",
-        "required": ["network", "token", "request_amount", "address"],
+        "required": ["network", "token", "request_amount", "address", "currency_type"],
         "properties": {
           "network": {
             "type": "string",
@@ -375,11 +375,16 @@
           },
           "request_amount": {
             "type": "number",
-            "description": "Valor em BRL para conversão"
+            "description": "Valor usado para calcular a cotação; interpretado conforme currency_type"
           },
           "address": {
             "type": "string",
             "description": "Endereço da carteira cripto"
+          },
+          "currency_type": {
+            "type": "string",
+            "enum": ["sender", "receiver"],
+            "description": "Define se request_amount representa o valor que o pagador envia (sender) ou o valor que o recebedor deve receber (receiver)"
           }
         }
       },
@@ -389,13 +394,25 @@
           "quote": {
             "type": "object",
             "properties": {
+              "quote_id": {
+                "type": "string",
+                "description": "Identificador da cotação"
+              },
               "quotation": {
                 "type": "number",
                 "description": "Taxa de cotação"
               },
+              "commercial_quotation": {
+                "type": "number",
+                "description": "Taxa comercial aplicada"
+              },
               "expires_at": {
                 "type": "number",
                 "description": "Timestamp de expiração da cotação"
+              },
+              "flat_fee": {
+                "type": "number",
+                "description": "Tarifa fixa aplicada"
               },
               "receiver_amount": {
                 "type": "number",
@@ -403,7 +420,15 @@
               },
               "sender_amount": {
                 "type": "number",
-                "description": "Valor em BRL enviado"
+                "description": "Valor que o pagador envia"
+              },
+              "partner_fee_amount": {
+                "type": "number",
+                "description": "Valor de taxa do parceiro, quando aplicável"
+              },
+              "payin_quote_id": {
+                "type": "string",
+                "description": "Identificador de referência da cotação de entrada"
               }
             }
           },
@@ -463,21 +488,21 @@
       "PaymentDataDto": {
         "type": "object",
         "properties": {
-          "value": {
-            "type": "number",
-            "description": "Valor do pagamento em BRL"
-          },
-          "payment_code": {
+          "pix_code": {
             "type": "string",
-            "description": "Código do pagamento PIX"
+            "description": "Código/coṕia e cola PIX gerado"
           },
           "quote_id": {
             "type": "string",
             "description": "ID da cotação utilizada"
           },
           "transaction_id": {
-            "type": "string",
+            "type": "number",
             "description": "ID da transação gerada"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status do pagamento (ex: processing)"
           }
         }
       },

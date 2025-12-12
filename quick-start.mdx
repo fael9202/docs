@@ -1,0 +1,305 @@
+---
+title: 'Início Rápido'
+description: 'Exemplo prático completo de integração com a API da 3x Change'
+---
+
+## Exemplo Completo de Integração
+
+Este guia mostra um exemplo prático de como integrar a API da 3x Change em uma aplicação real. Vamos criar um sistema que converte PIX em Bitcoin.
+
+## Configuração Inicial
+
+### 1. Instalar Dependências
+
+<CodeGroup>
+
+```bash npm
+npm install axios
+```
+
+```bash pip
+pip install requests
+```
+
+```bash composer
+composer require guzzlehttp/guzzle
+```
+
+</CodeGroup>
+
+### 2. Configurar Variáveis de Ambiente
+
+```bash .env
+# Suas credenciais da 3x Change
+API_KEY=your_api_key_here
+BASE_URL=https://api.3xchange.co/v1
+```
+
+## Implementação Completa
+
+### Exemplo em Node.js
+
+```javascript
+const axios = require('axios');
+
+class ThreeXChangeAPI {
+  constructor(apiKey, baseUrl = 'https://api.3xchange.co/v1') {
+    this.apiKey = apiKey;
+    this.baseUrl = baseUrl;
+  }
+
+  // Fazer requisição autenticada
+  async makeRequest(method, endpoint, data = null) {
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const config = {
+      method,
+      url,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (data) {
+      config.data = data;
+    }
+
+    try {
+      const response = await axios(config);
+      return response.data;
+    } catch (error) {
+      console.error('Erro na requisição:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  // Criar carteira
+  async createWallet(currency, label) {
+    return this.makeRequest('POST', '/wallets', {
+      currency,
+      label
+    });
+  }
+
+  // Obter cotação
+  async getQuote(currency, amount) {
+    return this.makeRequest('GET', `/quotes?currency=${currency}&amount=${amount}`);
+  }
+
+  // Criar pagamento
+  async createPayment(walletId, amount, currency) {
+    return this.makeRequest('POST', '/payments', {
+      wallet_id: walletId,
+      amount,
+      currency
+    });
+  }
+}
+
+// Exemplo de uso
+async function exemploCompleto() {
+  const api = new ThreeXChangeAPI(
+    process.env.API_KEY
+  );
+
+  try {
+    console.log('🚀 Iniciando integração...');
+
+    // 1. Criar carteira Bitcoin
+    console.log('📱 Criando carteira Bitcoin...');
+    const wallet = await api.createWallet('BTC', 'Carteira de exemplo');
+    console.log('✅ Carteira criada:', wallet.id);
+
+    // 2. Obter cotação
+    console.log('💰 Consultando cotação...');
+    const quote = await api.getQuote('BTC', 100); // R$ 100 em Bitcoin
+    console.log('✅ Cotação obtida:', quote);
+
+    // 3. Criar pagamento PIX
+    console.log('💳 Criando pagamento PIX...');
+    const payment = await api.createPayment(
+      wallet.id,
+      100, // R$ 100
+      'BRL'
+    );
+    console.log('✅ Pagamento criado:', payment);
+
+    console.log('🎉 Integração concluída com sucesso!');
+    console.log('📋 Próximos passos:');
+    console.log('   - Pague o PIX gerado');
+    console.log('   - Configure webhook para receber notificações');
+    console.log('   - Monitore o status do pagamento');
+
+  } catch (error) {
+    console.error('❌ Erro na integração:', error.message);
+  }
+}
+
+// Executar exemplo
+exemploCompleto();
+```
+
+### Exemplo em Python
+
+```python
+import requests
+
+class ThreeXChangeAPI:
+    def __init__(self, api_key, base_url='https://api.3xchange.co/v1'):
+        self.api_key = api_key
+        self.base_url = base_url
+
+    def make_request(self, method, endpoint, data=None):
+        """Fazer requisição autenticada"""
+        url = f"{self.base_url}{endpoint}"
+        
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        try:
+            if method.upper() == 'GET':
+                response = requests.get(url, headers=headers, params=data)
+            else:
+                response = requests.request(method, url, headers=headers, json=data)
+            
+            response.raise_for_status()
+            return response.json()
+            
+        except requests.exceptions.RequestException as e:
+            print(f'Erro na requisição: {e}')
+            raise
+
+    def create_wallet(self, currency, label):
+        """Criar carteira"""
+        return self.make_request('POST', '/wallets', {
+            'currency': currency,
+            'label': label
+        })
+
+    def get_quote(self, currency, amount):
+        """Obter cotação"""
+        return self.make_request('GET', f'/quotes?currency={currency}&amount={amount}')
+
+    def create_payment(self, wallet_id, amount, currency):
+        """Criar pagamento"""
+        return self.make_request('POST', '/payments', {
+            'wallet_id': wallet_id,
+            'amount': amount,
+            'currency': currency
+        })
+
+# Exemplo de uso
+def exemplo_completo():
+    api = ThreeXChangeAPI(
+        os.getenv('API_KEY')
+    )
+
+    try:
+        print('🚀 Iniciando integração...')
+
+        # 1. Criar carteira Bitcoin
+        print('📱 Criando carteira Bitcoin...')
+        wallet = api.create_wallet('BTC', 'Carteira de exemplo')
+        print(f'✅ Carteira criada: {wallet["id"]}')
+
+        # 2. Obter cotação
+        print('💰 Consultando cotação...')
+        quote = api.get_quote('BTC', 100)  # R$ 100 em Bitcoin
+        print(f'✅ Cotação obtida: {quote}')
+
+        # 3. Criar pagamento PIX
+        print('💳 Criando pagamento PIX...')
+        payment = api.create_payment(
+            wallet['id'],
+            100,  # R$ 100
+            'BRL'
+        )
+        print(f'✅ Pagamento criado: {payment}')
+
+        print('🎉 Integração concluída com sucesso!')
+        print('📋 Próximos passos:')
+        print('   - Pague o PIX gerado')
+        print('   - Configure webhook para receber notificações')
+        print('   - Monitore o status do pagamento')
+
+    except Exception as error:
+        print(f'❌ Erro na integração: {error}')
+
+# Executar exemplo
+if __name__ == '__main__':
+    exemplo_completo()
+```
+
+## Configuração de Webhook
+
+Para receber notificações em tempo real, configure um webhook:
+
+```javascript
+// Exemplo de webhook em Node.js com Express
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+// Endpoint para receber webhooks
+app.post('/webhook/3xchange', (req, res) => {
+  const { type, data } = req.body;
+  
+  switch (type) {
+    case 'payment.completed':
+      console.log('✅ Pagamento confirmado:', data);
+      // Atualizar status no seu sistema
+      break;
+      
+    case 'payment.failed':
+      console.log('❌ Pagamento falhou:', data);
+      // Notificar usuário
+      break;
+      
+    default:
+      console.log('📨 Webhook recebido:', type, data);
+  }
+  
+  res.status(200).send('OK');
+});
+
+app.listen(3000, () => {
+  console.log('🚀 Webhook server rodando na porta 3000');
+});
+```
+
+## Próximos Passos
+
+<CardGroup cols={2}>
+  <Card
+    title="Conceitos Fundamentais"
+    icon="book"
+    href="/concepts"
+  >
+    Entenda os termos e conceitos da API
+  </Card>
+  <Card
+    title="Guia de Integração"
+    icon="code"
+    href="/integration-guide"
+  >
+    Guia detalhado para diferentes cenários
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="bell"
+    href="/api-reference/webhook/webhook-payment"
+  >
+    Configure notificações em tempo real
+  </Card>
+  <Card
+    title="API Reference"
+    icon="api"
+    href="/api-reference/introduction"
+  >
+    Documentação completa dos endpoints
+  </Card>
+</CardGroup>

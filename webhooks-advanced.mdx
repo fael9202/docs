@@ -1,13 +1,26 @@
 ---
-title: "Webhook de Pagamento (Payin)"
-description: "Notificações em tempo real para eventos crypto.payin.*"
+title: 'Webhooks'
+description: 'Eventos de webhook para payin (PIX) com exemplos completos'
 ---
 
-## Visão Geral
+## Introdução
 
-Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.new`, `crypto.payin.updated` e `crypto.payin.completed`.
+A API envia webhooks para payin (entrada via PIX) notificando o ciclo completo: criação do PIX, atualizações e conclusão com transferência on-chain. Eventos:
 
-## Exemplos
+- `crypto.payin.new`
+- `crypto.payin.updated`
+- `crypto.payin.completed`
+
+## Estrutura e Campos
+
+- `event`: tipo do evento.
+- `timestamp`: ISO 8601 do envio.
+- `payin`: `{ external_id, transaction_id, status }`
+- `quote`: `{ quote_id, amount_brl, amount_usd, rate, expires_at }`
+- `pix`: `{ pix_code, txid, status }`
+- `transfer`: `{ tx_hash, network, status }` (a partir de `updated`; completo em `completed`)
+
+## Exemplos de Eventos
 
 ### crypto.payin.new
 
@@ -18,7 +31,7 @@ Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.n
   "payin": {
     "external_id": "pi_nGM1ETJIVXKF",
     "transaction_id": 84,
-    "status": "processing"
+    "status": "PROCESSING"
   },
   "quote": {
     "quote_id": 278,
@@ -30,7 +43,7 @@ Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.n
   "pix": {
     "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
     "txid": "7b2f40d6166a4f339613bb568d00992d",
-    "status": "processing"
+    "status": "PROCESSING"
   }
 }
 ```
@@ -44,7 +57,7 @@ Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.n
   "payin": {
     "external_id": "pi_nGM1ETJIVXKF",
     "transaction_id": 84,
-    "status": "processing"
+    "status": "PROCESSING"
   },
   "quote": {
     "quote_id": 278,
@@ -56,12 +69,12 @@ Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.n
   "pix": {
     "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
     "txid": "7b2f40d6166a4f339613bb568d00992d",
-    "status": "processing"
+    "status": "COMPLETED"
   },
   "transfer": {
     "tx_hash": null,
     "network": null,
-    "status": "processing"
+    "status": "PROCESSING"
   }
 }
 ```
@@ -97,15 +110,9 @@ Receba notificações do fluxo de payin (PIX) com três eventos: `crypto.payin.n
 }
 ```
 
-## Resposta Esperada
+### Configuração no Dashboard
 
-Sua aplicação deve responder com status `200 OK` para indicar que o webhook foi processado com sucesso. Se não recebermos uma resposta `200` dentro de 30 segundos, tentaremos reenviar o webhook.
-
-## Tentativas de Reenvio
-
-- **Primeira tentativa**: Imediatamente após o evento
-- **Segunda tentativa**: 5 segundos depois
-- **Terceira tentativa**: 15 segundos depois
-- **Quarta tentativa**: 25 segundos depois
-
-Após 4 tentativas sem sucesso, o webhook será descartado.
+1. Acesse o [Dashboard](https://app.3xchange.co)
+2. Vá em "Configurações" > "Webhooks"
+3. Adicione a URL do seu endpoint
+4. Salve as configurações

@@ -1,0 +1,194 @@
+---
+title: 'Conceitos Fundamentais'
+description: 'Entenda os termos e conceitos essenciais da API da 3x Change'
+---
+
+## Glossário de Termos
+
+Esta página explica os principais conceitos e termos técnicos utilizados na API da 3x Change.
+
+## Conceitos Básicos
+
+### API (Application Programming Interface)
+Interface que permite que diferentes sistemas se comuniquem. A API da 3x Change permite que sua aplicação interaja com nossos serviços de conversão PIX para criptomoedas.
+
+### Endpoint
+URL específica onde você pode acessar um recurso ou funcionalidade da API. Por exemplo: `POST /v1/wallets` para criar uma carteira.
+
+### HTTP Methods
+Métodos utilizados para diferentes tipos de operações:
+
+- **GET**: Buscar/consultar dados
+- **POST**: Criar novos recursos
+- **PUT**: Atualizar recursos existentes
+- **DELETE**: Remover recursos
+
+## Autenticação e Segurança
+
+### API Key
+Chave de identificação única que autentica sua aplicação na API. É enviada no header `Authorization: Bearer YOUR_API_KEY`.
+
+
+## Carteiras e Criptomoedas
+
+### Carteira Cripto
+Endereço blockchain onde as criptomoedas são armazenadas. Cada carteira possui um endereço único e pode receber apenas um tipo de criptomoeda.
+
+### Endereço de Carteira
+String alfanumérica que identifica uma carteira na blockchain. Exemplo: `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa` (Bitcoin).
+
+### Currency Code
+Código de 3 letras que identifica uma criptomoeda:
+- `BTC` - Bitcoin
+- `ETH` - Ethereum
+- `USDT` - Tether
+- `USDC` - USD Coin
+
+### Label
+Nome descritivo para identificar uma carteira em sua aplicação. Exemplo: "Carteira Bitcoin Principal".
+
+## Pagamentos e Conversões
+
+### PIX
+Sistema de pagamentos instantâneos brasileiro que permite transferências 24/7. Utilizado para receber pagamentos em reais.
+
+### QR Code PIX
+Código QR que contém as informações do pagamento PIX. Pode ser escaneado por aplicativos bancários para realizar o pagamento.
+
+### Chave PIX
+Identificador do pagamento PIX. Pode ser uma chave aleatória, CPF, CNPJ, email ou telefone.
+
+### Valor de Conversão
+Quantidade em reais (BRL) que será convertida para criptomoedas. O valor mínimo é R$ 10,00.
+
+### Taxa de Conversão
+Taxa aplicada sobre o valor da conversão. Inclui spread de mercado e taxas de processamento.
+
+## Cotações e Preços
+
+### Cotação
+Preço atual de uma criptomoeda em relação ao real brasileiro. Atualizada em tempo real baseada em exchanges internacionais.
+
+### Spread
+Diferença entre o preço de compra e venda de uma criptomoeda. Incluído na cotação final.
+
+### Rate Limit
+Limite de requisições por minuto para evitar sobrecarga da API. Padrão: 100 requisições por minuto.
+
+## Webhooks e Notificações
+
+### Webhook
+URL em sua aplicação que recebe notificações automáticas sobre eventos da API. Configurado para receber atualizações em tempo real.
+
+### Evento
+Ação que dispara uma notificação via webhook. Exemplos:
+- `payment.completed` - Pagamento confirmado
+- `payment.failed` - Pagamento falhou
+- `wallet.created` - Carteira criada
+
+### Payload
+Dados enviados no corpo da requisição webhook contendo informações sobre o evento.
+
+### Retry
+Tentativas automáticas de reenvio do webhook em caso de falha. Máximo de 3 tentativas com intervalos exponenciais.
+
+## Status e Estados
+
+### Status de Pagamento
+Estado atual de um pagamento:
+- `pending` - Aguardando pagamento
+- `processing` - Processando
+- `completed` - Concluído
+- `failed` - Falhou
+- `expired` - Expirado
+
+### Status de Carteira
+Estado atual de uma carteira:
+- `active` - Ativa e funcionando
+- `inactive` - Inativa
+- `suspended` - Suspensa
+
+## Códigos de Resposta HTTP
+
+### 200 OK
+Requisição processada com sucesso.
+
+### 201 Created
+Recurso criado com sucesso.
+
+### 400 Bad Request
+Dados inválidos na requisição.
+
+### 401 Unauthorized
+Credenciais inválidas ou ausentes.
+
+### 403 Forbidden
+Acesso negado ao recurso.
+
+### 404 Not Found
+Recurso não encontrado.
+
+### 429 Too Many Requests
+Rate limit excedido.
+
+### 500 Internal Server Error
+Erro interno do servidor.
+
+## Ambientes
+
+### Produção
+Ambiente principal da API utilizado para transações reais:
+- URL: `https://api.3xchange.co/v1`
+- Transações reais
+- Criptomoedas reais
+
+### Sandbox
+Ambiente de testes para desenvolvimento:
+- URL: `https://sandbox.3xchange.co/v1`
+- Transações simuladas
+- Criptomoedas de teste
+
+## Boas Práticas
+
+### Segurança
+- Mantenha suas credenciais seguras
+- Use HTTPS em todas as requisições
+- Implemente rate limiting no seu lado
+
+### Performance
+- Cache cotações quando possível
+- Use webhooks ao invés de polling
+- Implemente retry com backoff exponencial
+- Monitore logs de erro
+
+### Desenvolvimento
+- Use ambiente sandbox para testes
+- Implemente logs detalhados
+- Trate todos os códigos de erro
+- Teste cenários de falha
+
+## Recursos Adicionais
+
+<CardGroup cols={2}>
+  <Card
+    title="Primeiros Passos"
+    icon="play"
+    href="/getting-started"
+  >
+    Guia completo para começar
+  </Card>
+  <Card
+    title="Início Rápido"
+    icon="rocket"
+    href="/quick-start"
+  >
+    Exemplo prático de integração
+  </Card>
+  <Card
+    title="Autenticação"
+    icon="key"
+    href="/authentication"
+  >
+    Configurar credenciais de API
+  </Card>
+</CardGroup>

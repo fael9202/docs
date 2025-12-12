@@ -39,20 +39,45 @@ Cria um pagamento PIX baseado em uma cotação previamente gerada. Este endpoint
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  <ResponseField name="value" type="number">
-    Valor do pagamento em BRL
-  </ResponseField>
-
-  <ResponseField name="payment_code" type="string">
-    Código do pagamento PIX
+  <ResponseField name="pix_code" type="string">
+    Código/coṕia e cola do pagamento PIX
   </ResponseField>
 
   <ResponseField name="quote_id" type="string">
     ID da cotação utilizada
   </ResponseField>
 
-  <ResponseField name="transaction_id" type="string">
+  <ResponseField name="transaction_id" type="number">
     ID da transação gerada
   </ResponseField>
+
+  <ResponseField name="status" type="string">
+    Status do pagamento (ex: processing)
+  </ResponseField>
 </ResponseField>
+
+## Exemplo
+
+**Requisição**
+
+```json
+{
+  "quote_id": "qu_cagAX1chzDXi"
+}
+```
+
+**Resposta**
+
+```json
+{
+  "success": true,
+  "message": "Payment created successfully",
+  "data": {
+    "pix_code": "00020101021226790014br.gov.bcb.pix2557brcode.starkinfra.com/v2/7b2f40d6166a4f339613bb568d00992d5204000053039865802BR5915Blind Pay, Inc.6010Vila Velha62070503***63044C6B",
+    "quote_id": "qu_cagAX1chzDXi",
+    "transaction_id": 84,
+    "status": "processing"
+  }
+}
+```
 
