@@ -240,6 +240,213 @@
           }
         }
       }
+    },
+    "/exchange/bank-accounts": {
+      "post": {
+        "tags": ["Contas Bancárias"],
+        "operationId": "createBankAccount",
+        "summary": "Criar Conta Bancária",
+        "description": "Cria uma conta bancária PIX usando nome e chave PIX",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conta bancária criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankAccountResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Contas Bancárias"],
+        "operationId": "listBankAccounts",
+        "summary": "Listar Contas Bancárias",
+        "description": "Lista todas as contas bancárias do usuário",
+        "responses": {
+          "200": {
+            "description": "Contas bancárias listadas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankAccountListResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exchange/bank-accounts/{id}": {
+      "get": {
+        "tags": ["Contas Bancárias"],
+        "operationId": "getBankAccount",
+        "summary": "Buscar Conta Bancária",
+        "description": "Busca uma conta bancária pelo ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da conta bancária"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conta bancária encontrada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankAccountResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Contas Bancárias"],
+        "operationId": "updateBankAccount",
+        "summary": "Atualizar Conta Bancária",
+        "description": "Atualiza o nome da conta bancária",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da conta bancária"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conta bancária atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankAccountResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Contas Bancárias"],
+        "operationId": "deleteBankAccount",
+        "summary": "Deletar Conta Bancária",
+        "description": "Remove a conta bancária",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da conta bancária"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conta bancária removida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exchange/payout-quote": {
+      "post": {
+        "tags": ["Payout"],
+        "operationId": "createPayoutQuote",
+        "summary": "Criar Quote de Payout",
+        "description": "Cria uma cotação de payout para converter USDC/USDT em BRL e liquidar em conta bancária PIX",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayoutQuoteRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payout quote criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutQuoteResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exchange/payout": {
+      "post": {
+        "tags": ["Payout"],
+        "operationId": "createPayout",
+        "summary": "Criar Payout",
+        "description": "Executa um payout a partir de uma payout quote existente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayoutRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payout executado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutResponseWrapperDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -519,6 +726,415 @@
           },
           "data": {
             "$ref": "#/components/schemas/PaymentDataDto"
+          }
+        }
+      },
+      "CreateBankAccountDto": {
+        "type": "object",
+        "required": ["name", "pix_key"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nome identificador da conta PIX"
+          },
+          "pix_key": {
+            "type": "string",
+            "description": "Chave PIX"
+          }
+        }
+      },
+      "UpdateBankAccountDto": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Novo nome da conta bancária"
+          }
+        }
+      },
+      "BankAccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID interno da conta"
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID do usuário"
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo da conta (ex: pix)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da conta"
+          },
+          "pix_key": {
+            "type": "string",
+            "description": "Chave PIX cadastrada"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da última atualização"
+          }
+        }
+      },
+      "BankAccountResponseWrapperDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica se a operação foi bem-sucedida"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem descritiva da operação"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BankAccountResponseDto"
+          }
+        }
+      },
+      "BankAccountListResponseWrapperDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica se a operação foi bem-sucedida"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem descritiva da operação"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankAccountResponseDto"
+            },
+            "description": "Lista de contas bancárias"
+          }
+        }
+      },
+      "PayoutQuoteRequestDto": {
+        "type": "object",
+        "required": [
+          "bank_account_id",
+          "currency_type",
+          "cover_fees",
+          "request_amount",
+          "network",
+          "token"
+        ],
+        "properties": {
+          "bank_account_id": {
+            "type": "number",
+            "description": "ID interno da conta bancária"
+          },
+          "currency_type": {
+            "type": "string",
+            "enum": ["sender", "receiver"],
+            "description": "Sender: envia BRL; Receiver: valor alvo em USD/cripto"
+          },
+          "cover_fees": {
+            "type": "boolean",
+            "description": "Define se o usuário cobre as taxas"
+          },
+          "request_amount": {
+            "type": "number",
+            "description": "Valor solicitado em BRL"
+          },
+          "network": {
+            "type": "string",
+            "enum": ["base", "polygon", "ethereum", "tron", "solana"],
+            "description": "Rede blockchain para o payout"
+          },
+          "token": {
+            "type": "string",
+            "enum": ["USDC", "USDT"],
+            "description": "Token da cotação"
+          }
+        }
+      },
+      "PayoutQuoteDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID interno da quote"
+          },
+          "quote_id": {
+            "type": "string",
+            "description": "ID externo da cotação"
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID do usuário"
+          },
+          "bankAccountId": {
+            "type": "number",
+            "description": "ID da conta bancária utilizada"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token da cotação (USDC ou USDT)"
+          },
+          "network": {
+            "type": "string",
+            "description": "Rede blockchain"
+          },
+          "commercial_quotation": {
+            "type": "string",
+            "description": "Taxa comercial (cotação)"
+          },
+          "quotation": {
+            "type": "string",
+            "description": "Taxa de cotação aplicada"
+          },
+          "receiver_amount": {
+            "type": "string",
+            "description": "Valor que será recebido (BRL, valores reais)"
+          },
+          "sender_amount": {
+            "type": "string",
+            "description": "Valor que será enviado (BRL, valores reais)"
+          },
+          "partner_fee_amount": {
+            "type": "string",
+            "description": "Taxa do parceiro (BRL)"
+          },
+          "flat_fee": {
+            "type": "string",
+            "description": "Taxa fixa (BRL)"
+          },
+          "request_amount": {
+            "type": "string",
+            "description": "Valor solicitado (BRL, valores reais)"
+          },
+          "currency_type": {
+            "type": "string",
+            "description": "sender ou receiver"
+          },
+          "cover_fees": {
+            "type": "boolean",
+            "description": "Se o usuário cobre as taxas"
+          },
+          "receiver_local_amount": {
+            "type": "string",
+            "nullable": true,
+            "description": "Valor local do receptor, quando disponível"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição adicional"
+          },
+          "contract": {
+            "type": "object",
+            "description": "Dados do contrato ERC20 para aprovação/transferência",
+            "properties": {
+              "abi": {
+                "type": "array",
+                "items": { "type": "object" },
+                "description": "ABI do contrato do token"
+              },
+              "amount": {
+                "type": "string",
+                "description": "Quantidade em unidades do token"
+              },
+              "address": {
+                "type": "string",
+                "description": "Endereço do token"
+              },
+              "network": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "chainId": { "type": "number" }
+                }
+              },
+              "functionName": {
+                "type": "string",
+                "description": "Função sugerida (ex: approve)"
+              },
+              "contractAddress": {
+                "type": "string",
+                "description": "Endereço do contrato alvo"
+              }
+            }
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de expiração"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "PayoutQuoteResponseWrapperDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica se a operação foi bem-sucedida"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem descritiva da operação"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PayoutQuoteDataDto"
+          }
+        }
+      },
+      "PayoutRequestDto": {
+        "type": "object",
+        "required": ["payout_quote_id", "sender_wallet_address", "network"],
+        "properties": {
+          "payout_quote_id": {
+            "type": "number",
+            "description": "ID da payout quote previamente criada"
+          },
+          "sender_wallet_address": {
+            "type": "string",
+            "description": "Endereço da carteira que enviará o token"
+          },
+          "network": {
+            "type": "string",
+            "enum": ["base", "polygon", "ethereum", "tron", "solana"],
+            "description": "Rede usada para a transação"
+          }
+        }
+      },
+      "PayoutTrackingStepDto": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "type": "string",
+            "description": "Etapa do fluxo (ex: on_hold, processing)"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Status detalhado, quando disponível"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Data de conclusão da etapa"
+          },
+          "transaction_hash": {
+            "type": "string",
+            "nullable": true,
+            "description": "Hash da transação, quando aplicável"
+          },
+          "provider_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider_transaction_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "estimated_time_of_arrival": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PayoutDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID interno do payout"
+          },
+          "payout_id": {
+            "type": "string",
+            "description": "ID externo do payout"
+          },
+          "userId": {
+            "type": "number",
+            "description": "ID do usuário"
+          },
+          "payoutQuoteId": {
+            "type": "number",
+            "description": "ID da payout quote utilizada"
+          },
+          "sender_wallet_address": {
+            "type": "string",
+            "description": "Endereço da carteira de envio"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status do payout (ex: processing)"
+          },
+          "receiver_id": {
+            "type": "string",
+            "description": "Identificador do recebedor"
+          },
+          "tracking_complete": {
+            "$ref": "#/components/schemas/PayoutTrackingStepDto"
+          },
+          "tracking_payment": {
+            "$ref": "#/components/schemas/PayoutTrackingStepDto"
+          },
+          "tracking_transaction": {
+            "$ref": "#/components/schemas/PayoutTrackingStepDto"
+          },
+          "tracking_partner_fee": {
+            "$ref": "#/components/schemas/PayoutTrackingStepDto"
+          },
+          "tracking_liquidity": {
+            "$ref": "#/components/schemas/PayoutTrackingStepDto"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de atualização"
+          }
+        }
+      },
+      "PayoutResponseWrapperDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica se a operação foi bem-sucedida"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem descritiva da operação"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PayoutDataDto"
           }
         }
       },
