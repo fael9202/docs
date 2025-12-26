@@ -1,0 +1,81 @@
+---
+title: "Payout"
+description: "Fluxo de payout: cotação, aprovação on-chain e execução"
+---
+
+## Visão Geral
+
+O payout converte USDC/USDT em BRL e liquida via conta PIX cadastrada. Pré-requisito: ter uma conta bancária criada (`/exchange/bank-accounts`). Fluxo:
+
+1) Criar a payout quote (`POST /exchange/payout-quote`)  
+2) Aprovar o token conforme o `contract` retornado (approve)  
+3) Executar o payout (`POST /exchange/payout`)
+
+
+## 1. Criar Payout Quote
+
+Endpoint: `POST /exchange/payout-quote`  
+Entrada (conceito):
+- `bank_account_id`: ID interno da conta PIX já criada
+- `currency_type`: `sender` (você envia cripto) ou `receiver` (define BRL a receber)
+- `cover_fees`: quem cobre as taxas
+- `request_amount`: valor conforme `currency_type`
+- `network`: base, polygon, ethereum, tron, solana
+- `token`: USDC ou USDT
+
+Principais saídas:
+- `quotation` / `commercial_quotation`: taxas aplicadas
+- `receiver_amount` / `sender_amount`: valores em BRL (valores reais, não centavos)
+- `contract`: instruções para aprovação on-chain
+- `expires_at`: crie nova quote após expirar
+
+## 2. Aprovação on-chain (contract)
+
+O campo `contract` retorna tudo que você precisa para autorizar o envio do token:
+- `abi`: ABI do token (ERC20)
+- `amount`: quantidade a aprovar (em unidades do token)
+- `address`: token
+- `network`: `{ name, chainId }`
+- `functionName`: geralmente `approve`
+- `contractAddress`: endereço a ser aprovado como spender
+
+Fluxo típico:
+1. Conecte a carteira na rede `network.chainId`.
+2. Chame `approve(contractAddress, amount)` com a ABI e endereços fornecidos.
+3. Aguarde a confirmação on-chain antes de chamar o payout.
+
+## 3. Executar o Payout
+
+Endpoint: `POST /exchange/payout`  
+Entrada (conceito):
+- `payout_quote_id`: quote válida (não expirada)
+- `sender_wallet_address`: carteira que enviará o token
+- `network`: mesma rede usada na quote/aprovação
+
+Principais campos da resposta:
+- `status`: estado atual (ex.: `processing`)
+- `payout_id`: identificador externo
+- `tracking_transaction`: etapa on-chain (hash, step/status)
+- `tracking_payment`: pagamento/saque bancário (provider info)
+- `tracking_liquidity`: liquidez do provedor
+- `tracking_partner_fee`: taxa do parceiro
+- `tracking_complete`: consolidação final
+
+Use webhooks/tracking para acompanhar a liquidação até a conclusão.
+
+## Erros comuns
+- 400: parâmetros inválidos (rede/token fora do enum, request_amount inválido)
+- 404: bank account ou receiver não encontrados
+- 500: erro ao criar ou processar payout
+
+## Boas práticas
+- Reutilize `payout_quote_id` apenas enquanto a quote não expirar.
+- Respeite a mesma `network` na aprovação e no `POST /exchange/payout`.
+- Faça idempotência no seu backend (ex.: por `payout_quote_id`).
+- Logue o `payout_id` para correlacionar webhooks/status.
+
+## Referências rápidas
+- Cotação: `/exchange/payout-quote`
+- Execução: `/exchange/payout`
+- Conta bancária (PIX): `/exchange/bank-accounts`
+

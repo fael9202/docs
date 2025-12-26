@@ -47,7 +47,7 @@ Código de 3 letras que identifica uma criptomoeda:
 ### Label
 Nome descritivo para identificar uma carteira em sua aplicação. Exemplo: "Carteira Bitcoin Principal".
 
-## Pagamentos e Conversões
+## Payin (Cotação + Pagamento)
 
 ### PIX
 Sistema de pagamentos instantâneos brasileiro que permite transferências 24/7. Utilizado para receber pagamentos em reais.
@@ -59,12 +59,12 @@ Código QR que contém as informações do pagamento PIX. Pode ser escaneado por
 Identificador do pagamento PIX. Pode ser uma chave aleatória, CPF, CNPJ, email ou telefone.
 
 ### Valor de Conversão
-Quantidade em reais (BRL) que será convertida para criptomoedas. O valor mínimo é R$ 10,00.
+Quantidade em reais (BRL) ou cripto alvo envolvida no payin, conforme `currency_type`.
 
 ### Taxa de Conversão
-Taxa aplicada sobre o valor da conversão. Inclui spread de mercado e taxas de processamento.
+Taxa aplicada sobre o payin (spread + tarifas). Define o valor final em cripto.
 
-## Cotações e Preços
+## Cotações e Preços (Payin)
 
 ### Cotação
 Preço atual de uma criptomoeda em relação ao real brasileiro. Atualizada em tempo real baseada em exchanges internacionais.

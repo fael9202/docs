@@ -29,10 +29,12 @@
     {
       "group": "Início",
       "pages": [
-        "introduction",
+  "introduction",
         "getting-started",
         "integration-guide",
         "webhooks-advanced",
+        "payin",
+        "payout",
         "authentication"
       ]
     },
@@ -52,10 +54,27 @@
       ]
     },
     {
-      "group": "Cotações e Pagamentos",
+      "group": "Payin (Cotação + Pagamento)",
       "pages": [
         "api-reference/endpoint/get-quote",
         "api-reference/endpoint/create-payment"
+      ]
+    },
+    {
+      "group": "Contas Bancárias",
+      "pages": [
+        "api-reference/endpoint/create-bank-account",
+        "api-reference/endpoint/list-bank-accounts",
+        "api-reference/endpoint/get-bank-account",
+        "api-reference/endpoint/update-bank-account",
+        "api-reference/endpoint/delete-bank-account"
+      ]
+    },
+    {
+      "group": "Payout (Cotação + Transferência)",
+      "pages": [
+        "api-reference/endpoint/create-payout-quote",
+        "api-reference/endpoint/create-payout"
       ]
     },
     {

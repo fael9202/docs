@@ -12,8 +12,7 @@ A 3x Change é uma API que facilita a conversão de PIX para criptomoedas de for
 O fluxo da 3x Change é simples e direto:
 
 1. **Criação de Carteira**: Crie uma carteira cripto passando os parâmetros necessários
-2. **Cotação**: Consulte a cotação atual das criptomoedas disponíveis
-3. **Pagamento PIX**: Gere um pagamento PIX e, após confirmação, receba automaticamente a criptomoeda
+2. **Payin (cotação + pagamento)**: Obtenha a cotação e gere o payin PIX; após confirmação, a cripto é enviada automaticamente
 
 <CardGroup cols={2}>
   <Card
@@ -24,18 +23,18 @@ O fluxo da 3x Change é simples e direto:
     Gerencie carteiras cripto para receber conversões de PIX
   </Card>
   <Card
-    title="Cotações"
-    icon="trending-up" 
+    title="Payin (Cotação + Pagamento)"
+    icon="credit-card"
     href="/api-reference/endpoint/get-quote"
   >
-    Consulte cotações em tempo real das criptomoedas disponíveis
+    Obtenha cotação e gere o payin PIX para conversão automática em cripto
   </Card>
   <Card
-    title="Pagamentos PIX"
-    icon="credit-card"
-    href="/api-reference/endpoint/create-pix-payment"
+    title="Contas Bancárias"
+    icon="banknotes"
+    href="/api-reference/endpoint/create-bank-account"
   >
-    Gere pagamentos PIX para conversão automática em criptomoedas
+    Cadastre contas bancárias com chave PIX
   </Card>
 </CardGroup>
 

@@ -1,0 +1,69 @@
+---
+title: "Payin"
+description: "Fluxo de payin: cotação, pagamento PIX e liquidação em cripto"
+---
+
+## Visão Geral
+
+O payin converte BRL (via PIX) em USDC/USDT e envia para uma carteira cripto. Pré-requisito: ter uma carteira criada (`/exchange/wallets`). Fluxo:
+
+1) Criar cotação (`POST /exchange/quote`)  
+2) Gerar o pagamento PIX (`POST /exchange/payment`)  
+3) Acompanhar liquidação e webhooks (`crypto.payin.*`)
+
+Envie sempre `X-API-Key`.
+
+## 1. Criar Cotação
+
+Endpoint: `POST /exchange/quote`  
+Entrada (conceito):
+- `network`: ethereum, tron, polygon, polygon_amoy
+- `token`: USDC ou USDT
+- `request_amount`: valor usado no cálculo
+- `address`: carteira de destino
+- `currency_type`: `sender` (valor que você envia em BRL) ou `receiver` (valor alvo em cripto)
+
+Principais saídas:
+- `quotation` / `commercial_quotation`: taxas aplicadas
+- `receiver_amount` / `sender_amount`: valores finais (BRL/cripto)
+- `quote_id` / `payin_quote_id`: identificador da cotação
+- `expires_at`: validade (5 minutos). Crie nova cotação após expirar.
+
+## 2. Criar Pagamento PIX
+
+Endpoint: `POST /exchange/payment`  
+Entrada (conceito):
+- `quote_id`: cotação válida (não expirada)
+
+Saída:
+- `pix_code`: código copia-e-cola
+- `transaction_id`: transação interna
+- `status`: inicial `processing`
+
+Pague o PIX dentro da validade da cotação para garantir os valores calculados.
+
+## 3. Acompanhar Liquidação (Webhooks)
+
+Use os webhooks `crypto.payin.new`, `crypto.payin.updated`, `crypto.payin.completed` para acompanhar:
+- Confirmação do PIX
+- Progresso on-chain
+- Conclusão e envio da cripto
+
+Recomendações:
+- Implemente idempotência por `transaction_id` + `external_id` (se usado).
+- Responda 200 OK rapidamente aos webhooks para evitar reentregas.
+
+## Boas Práticas
+
+- Reutilize a mesma cotação apenas enquanto estiver válida (`expires_at` ≈ 5 minutos).  
+- Mantenha `network` e `token` consistentes com a carteira informada.  
+- Logue `quote_id`, `transaction_id` e IDs de webhook para auditoria.  
+- Trate `currency_type`: `sender` = valor em BRL enviado; `receiver` = valor alvo em cripto.
+
+## Referências rápidas
+
+- Cotação: `/exchange/quote`
+- Pagamento: `/exchange/payment`
+- Webhooks de payin: `crypto.payin.*`
+- Carteira cripto: `/exchange/wallets`
+
