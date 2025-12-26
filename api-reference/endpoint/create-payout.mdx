@@ -1,0 +1,138 @@
+---
+title: "Criar Payout"
+openapi: 'POST /exchange/payout'
+description: "Executa um payout a partir de uma payout quote existente"
+---
+
+## Visão Geral
+
+Cria um payout usando uma payout quote já gerada. Converte USDC/USDT para BRL e liquida em uma conta PIX. Requer autenticação via `X-API-Key`.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string">
+    application/json
+  </ParamField>
+</ParamField>
+
+<ParamField path="body" type="object">
+  <Expandable title="PayoutRequestDto">
+
+    <ParamField path="payout_quote_id" type="number" required>
+      ID da payout quote criada previamente
+    </ParamField>
+
+    <ParamField path="sender_wallet_address" type="string" required>
+      Endereço da carteira que enviará o token
+    </ParamField>
+
+    <ParamField path="network" type="string" required>
+      Rede blockchain (base, polygon, ethereum, tron, solana)
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Exemplo de Request
+
+```json
+{
+  "payout_quote_id": 9,
+  "sender_wallet_address": "0x76B133142F59aB1089D474eaccf58F190f5a1A04",
+  "network": "ethereum"
+}
+```
+
+**cURL**
+
+```bash
+curl --request POST \
+  --url https://api.seudominio.com/exchange/payout \
+  --header 'X-API-Key: sua-api-key-aqui' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "payout_quote_id": 9,
+    "sender_wallet_address": "0x76B133142F59aB1089D474eaccf58F190f5a1A04",
+    "network": "ethereum"
+  }'
+```
+
+## Resposta de Sucesso
+
+```json
+{
+  "success": true,
+  "message": "Payout executed successfully",
+  "data": {
+    "id": 2,
+    "payout_id": "po_9txmFQUX0Jka",
+    "userId": 2,
+    "payoutQuoteId": 9,
+    "sender_wallet_address": "0x76B133142F59aB1089D474eaccf58F190f5a1A04",
+    "status": "processing",
+    "receiver_id": "re_OYk9ru8lLUB4",
+    "tracking_complete": {
+      "step": "on_hold",
+      "status": null,
+      "completed_at": null,
+      "transaction_hash": null
+    },
+    "tracking_payment": {
+      "step": "on_hold",
+      "completed_at": null,
+      "provider_name": null,
+      "provider_status": null,
+      "provider_transaction_id": null,
+      "estimated_time_of_arrival": null
+    },
+    "tracking_transaction": {
+      "step": "processing",
+      "status": null,
+      "completed_at": null,
+      "transaction_hash": null
+    },
+    "tracking_partner_fee": {
+      "step": "on_hold",
+      "completed_at": null,
+      "transaction_hash": null
+    },
+    "tracking_liquidity": {
+      "step": "on_hold",
+      "completed_at": null,
+      "provider_status": null,
+      "provider_transaction_id": null,
+      "estimated_time_of_arrival": null
+    },
+    "created_at": "2025-12-26T20:27:02.039Z",
+    "updated_at": "2025-12-26T20:27:02.039Z"
+  }
+}
+```
+
+## Campos da Resposta
+
+- `id` (number): ID interno do payout  
+- `payout_id` (string): ID externo do payout  
+- `userId` (number): ID do usuário  
+- `payoutQuoteId` (number): ID da payout quote usada  
+- `sender_wallet_address` (string): endereço de envio  
+- `status` (string): status do payout (ex: processing)  
+- `receiver_id` (string): identificador do recebedor  
+- `tracking_complete` (object): etapa de conclusão geral (`step`, `status`, `completed_at`, `transaction_hash`)  
+- `tracking_payment` (object): etapa de pagamento (`step`, `completed_at`, `provider_*`, `estimated_time_of_arrival`)  
+- `tracking_transaction` (object): etapa on-chain (`step`, `status`, `completed_at`, `transaction_hash`)  
+- `tracking_partner_fee` (object): etapa de taxa do parceiro (`step`, `completed_at`, `transaction_hash`)  
+- `tracking_liquidity` (object): etapa de liquidez (`step`, `completed_at`, `provider_*`, `estimated_time_of_arrival`)  
+- `created_at` (string): criação (ISO 8601)  
+- `updated_at` (string): atualização (ISO 8601)
+
+## Observações
+
+- Certifique-se de usar a mesma `network` do token e da payout quote.  
+- O status inicial é `processing`; use webhooks/tracking para acompanhar a liquidação.  
+- `payout_quote_id` deve referenciar uma quote válida e não expirada.
+

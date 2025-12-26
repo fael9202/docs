@@ -1,0 +1,281 @@
+---
+title: "Criar Quote de Payout"
+openapi: 'POST /exchange/payout-quote'
+description: "Cria uma cotação de payout para converter USDC/USDT em BRL e liquidar via conta PIX"
+---
+
+## Visão Geral
+
+Cria uma cotação de payout para converter USDC/USDT em BRL e liquidar em uma conta bancária PIX já cadastrada. Requer autenticação via `X-API-Key`.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string">
+    application/json
+  </ParamField>
+</ParamField>
+
+<ParamField path="body" type="object">
+  <Expandable title="PayoutQuoteRequestDto">
+
+    <ParamField path="bank_account_id" type="number" required>
+      ID interno da conta bancária criada anteriormente
+    </ParamField>
+
+    <ParamField path="currency_type" type="string" required>
+      "sender" (você envia cripto) ou "receiver" (você define o valor em BRL a receber)
+    </ParamField>
+
+    <ParamField path="cover_fees" type="boolean" required>
+      Define se o usuário cobre as taxas
+    </ParamField>
+
+    <ParamField path="request_amount" type="number" required>
+      Valor solicitado conforme `currency_type` (sender: valor em USDC/USDT que você envia; receiver: valor em BRL que deseja receber)
+    </ParamField>
+
+    <ParamField path="network" type="string" required>
+      Rede blockchain (base, polygon, ethereum, tron, solana)
+    </ParamField>
+
+    <ParamField path="token" type="string" required>
+      Token a receber (USDC ou USDT)
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Valores Permitidos
+
+- **Network**: base, polygon, ethereum, tron, solana  
+- **Token**: USDC, USDT  
+- **Currency Type**: sender, receiver
+
+## Exemplos de Request
+
+**Exemplo 1 – Ethereum / USDC**
+
+```json
+{
+  "bank_account_id": 1,
+  "currency_type": "sender",
+  "cover_fees": false,
+  "request_amount": 1000,
+  "network": "ethereum",
+  "token": "USDC"
+}
+```
+
+**Exemplo 2 – Polygon / USDT**
+
+```json
+{
+  "bank_account_id": 2,
+  "currency_type": "sender",
+  "cover_fees": true,
+  "request_amount": 500,
+  "network": "polygon",
+  "token": "USDT"
+}
+```
+
+**Exemplo 3 – Base / USDC**
+
+```json
+{
+  "bank_account_id": 1,
+  "currency_type": "sender",
+  "cover_fees": false,
+  "request_amount": 2500,
+  "network": "base",
+  "token": "USDC"
+}
+```
+
+**cURL**
+
+```bash
+curl --request POST \
+  --url https://api.seudominio.com/exchange/payout-quote \
+  --header 'X-API-Key: sua-api-key-aqui' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "bank_account_id": 1,
+    "currency_type": "sender",
+    "cover_fees": false,
+    "request_amount": 1000,
+    "network": "ethereum",
+    "token": "USDC"
+  }'
+```
+
+## Resposta de Sucesso
+
+```json
+{
+  "success": true,
+  "message": "Payout quote created successfully",
+  "data": {
+    "id": 9,
+    "quote_id": "qu_cERMuPTgWeCd",
+    "userId": 2,
+    "bankAccountId": 2,
+    "token": "USDC",
+    "network": "ethereum",
+    "commercial_quotation": "5.5478",
+    "quotation": "5.5395",
+    "receiver_amount": "5536.16",
+    "sender_amount": "1000",
+    "partner_fee_amount": "0",
+    "flat_fee": "0.6",
+    "request_amount": "1000",
+    "currency_type": "sender",
+    "cover_fees": false,
+    "receiver_local_amount": null,
+    "description": null,
+    "contract": {
+      "abi": [
+        {
+          "name": "name",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "payable": false,
+          "constant": true,
+          "stateMutability": "view"
+        }
+        /* demais itens da ABI omitidos para brevidade */
+      ],
+      "amount": "1000000000",
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "network": {
+        "name": "Ethereum Mainnet",
+        "chainId": 1
+      },
+      "functionName": "approve",
+      "contractAddress": "0x414A2e6289cCd775F7f9EEa3bBbe02256397B153"
+    },
+    "expires_at": "2025-12-26T20:31:29.050Z",
+    "created_at": "2025-12-26T20:26:29.355Z",
+    "updated_at": "2025-12-26T20:26:29.355Z"
+  }
+}
+```
+
+## Campos da Resposta
+
+- `id` (number): ID interno da quote  
+- `quote_id` (string): ID da cotação  
+- `userId` (number): ID do usuário  
+- `bankAccountId` (number): ID da conta bancária  
+- `token` (string): USDC ou USDT  
+- `network` (string): rede blockchain  
+- `commercial_quotation` (string): taxa comercial  
+- `quotation` (string): taxa aplicada  
+- `receiver_amount` (string): valor recebido em BRL (valores reais)  
+- `sender_amount` (string): valor enviado em BRL (valores reais)  
+- `partner_fee_amount` (string): taxa do parceiro (BRL)  
+- `flat_fee` (string): taxa fixa (BRL)  
+- `request_amount` (string): valor solicitado (BRL)  
+- `currency_type` (string): sender ou receiver  
+- `cover_fees` (boolean): se o usuário cobre as taxas  
+- `receiver_local_amount` (string|null): valor local do receptor  
+- `description` (string|null): descrição adicional  
+- `contract` (object): dados para interação com o contrato do token  
+  - `abi` (array): ABI do token  
+  - `amount` (string): quantidade em unidades do token  
+  - `address` (string): endereço do token  
+  - `network` (object): { name, chainId }  
+  - `functionName` (string): função sugerida (ex: approve)  
+  - `contractAddress` (string): contrato alvo  
+- `expires_at` (string): expiração (ISO 8601)  
+- `created_at` (string): criação (ISO 8601)  
+- `updated_at` (string): atualização (ISO 8601)
+
+## Erros Possíveis
+
+**400 Bad Request — Network inválido**
+
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "network must be one of: base, polygon, ethereum, tron, solana"
+  ],
+  "error": "Bad Request"
+}
+```
+
+**400 Bad Request — Token inválido**
+
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "token must be one of: USDC, USDT"
+  ],
+  "error": "Bad Request"
+}
+```
+
+**400 Bad Request — Bank account não pertence ao usuário**
+
+```json
+{
+  "statusCode": 400,
+  "message": "Bank account não pertence ao usuário"
+}
+```
+
+**404 Not Found — Bank account não encontrada**
+
+```json
+{
+  "statusCode": 404,
+  "message": "Bank account não encontrada"
+}
+```
+
+**404 Not Found — Receiver não encontrado**
+
+```json
+{
+  "statusCode": 404,
+  "message": "Receiver não encontrado para o usuário"
+}
+```
+
+**400 Bad Request — Request amount inválido**
+
+```json
+{
+  "statusCode": 400,
+  "message": "request_amount inválido: deve ser número positivo"
+}
+```
+
+**500 Internal Server Error — Erro**
+
+```json
+{
+  "statusCode": 500,
+  "message": "Erro ao criar cotação de payout"
+}
+```
+
+## Observações
+
+- Valores monetários em BRL são retornados em valores reais (ex: "1000" = R$ 1.000,00).  
+- A cotação expira em `expires_at`; após isso, solicite uma nova.  
+- `network` e `token` aceitam apenas os valores permitidos (enum).  
+- `currency_type`: `sender` = envia BRL e recebe cripto; `receiver` = envia cripto e recebe BRL.
+
