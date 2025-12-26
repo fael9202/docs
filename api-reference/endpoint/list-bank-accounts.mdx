@@ -1,0 +1,84 @@
+---
+title: "Listar Contas Bancárias"
+openapi: 'GET /exchange/bank-accounts'
+description: "Lista todas as contas bancárias (PIX) do usuário autenticado"
+---
+
+## Visão Geral
+
+Retorna todas as contas bancárias cadastradas para o usuário. É necessário o header `X-API-Key`.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string">
+    application/json
+  </ParamField>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Lista de contas bancárias
+</ResponseField>
+
+## Exemplos
+
+**cURL**
+
+```bash
+curl --request GET \
+  --url https://api.seudominio.com/exchange/bank-accounts \
+  --header 'X-API-Key: sua-api-key-aqui'
+```
+
+**Resposta (200 OK)**
+
+```json
+{
+  "success": true,
+  "message": "Bank accounts retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "userId": 123,
+      "type": "pix",
+      "name": "Conta Principal PIX",
+      "pix_key": "12345678900",
+      "created_at": "2025-12-23T10:00:00.000Z",
+      "updated_at": "2025-12-23T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "userId": 123,
+      "type": "pix",
+      "name": "Conta Secundária",
+      "pix_key": "98765432100",
+      "created_at": "2025-12-23T11:00:00.000Z",
+      "updated_at": "2025-12-23T11:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Sem contas**
+
+```json
+{
+  "success": true,
+  "message": "Bank accounts retrieved successfully",
+  "data": []
+}
+```
+

@@ -1,0 +1,62 @@
+---
+title: "Deletar Conta Bancária"
+openapi: 'DELETE /exchange/bank-accounts/{id}'
+description: "Remove uma conta bancária"
+---
+
+## Visão Geral
+
+Deleta a conta bancária especificada. Requer header `X-API-Key`.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+</ParamField>
+
+<ParamField path="path.id" type="string" required>
+  ID da conta bancária
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="null">
+  Retorna null ao remover a conta
+</ResponseField>
+
+## Exemplos
+
+**cURL**
+
+```bash
+curl --request DELETE \
+  --url https://api.seudominio.com/exchange/bank-accounts/1 \
+  --header 'X-API-Key: sua-api-key-aqui'
+```
+
+**Resposta (200 OK)**
+
+```json
+{
+  "success": true,
+  "message": "Bank account deleted successfully",
+  "data": null
+}
+```
+
+## Erros Possíveis
+
+- 404 NOT_FOUND — Conta não encontrada ou receiver não encontrado
+- 400 BAD_REQUEST — Conta não pertence ao usuário
+- 500 INTERNAL_SERVER_ERROR — Erro ao deletar
+

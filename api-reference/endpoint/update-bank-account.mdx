@@ -1,0 +1,92 @@
+---
+title: "Atualizar Conta Bancária"
+openapi: 'PUT /exchange/bank-accounts/{id}'
+description: "Atualiza o nome de uma conta bancária PIX"
+---
+
+## Visão Geral
+
+Atualiza o campo `name` de uma conta bancária existente. Requer header `X-API-Key`.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string">
+    application/json
+  </ParamField>
+</ParamField>
+
+<ParamField path="path.id" type="string" required>
+  ID da conta bancária
+</ParamField>
+
+<ParamField path="body" type="object">
+  <Expandable title="UpdateBankAccountDto">
+    <ParamField path="name" type="string" required>
+      Novo nome da conta bancária
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Conta bancária atualizada
+</ResponseField>
+
+## Exemplos
+
+**cURL**
+
+```bash
+curl --request PUT \
+  --url https://api.seudominio.com/exchange/bank-accounts/1 \
+  --header 'X-API-Key: sua-api-key-aqui' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "Novo Nome da Conta"
+  }'
+```
+
+**Request Body**
+
+```json
+{
+  "name": "Novo Nome da Conta"
+}
+```
+
+**Resposta (200 OK)**
+
+```json
+{
+  "success": true,
+  "message": "Bank account updated successfully",
+  "data": {
+    "id": 1,
+    "userId": 123,
+    "type": "pix",
+    "name": "Novo Nome da Conta",
+    "pix_key": "12345678900",
+    "created_at": "2025-12-23T10:00:00.000Z",
+    "updated_at": "2025-12-23T12:00:00.000Z"
+  }
+}
+```
+
+## Erros Possíveis
+
+- 404 NOT_FOUND — Conta não encontrada
+- 400 BAD_REQUEST — Conta não pertence ao usuário
+

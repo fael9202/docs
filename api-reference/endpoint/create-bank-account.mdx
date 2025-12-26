@@ -1,0 +1,137 @@
+---
+title: "Criar Conta Bancária (Bank Account)"
+openapi: 'POST /exchange/bank-accounts'
+description: "Cria uma conta bancária PIX usando chave e nome"
+---
+
+## Visão Geral
+
+Cria uma conta bancária do tipo PIX vinculada ao seu usuário. É necessário enviar o header `X-API-Key` para autenticação.
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="X-API-Key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string">
+    application/json
+  </ParamField>
+</ParamField>
+
+<ParamField path="body" type="object">
+  <Expandable title="CreateBankAccountDto">
+
+    <ParamField path="name" type="string" required>
+      Nome identificador da conta PIX (ex: "Minha Conta PIX")
+    </ParamField>
+
+    <ParamField path="pix_key" type="string" required>
+      Chave PIX a ser vinculada à conta
+    </ParamField>
+
+  </Expandable>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <ResponseField name="id" type="number">
+    ID interno da conta
+  </ResponseField>
+
+  <ResponseField name="userId" type="number">
+    ID do usuário
+  </ResponseField>
+
+  <ResponseField name="type" type="string">
+    Tipo da conta (ex: "pix")
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Nome da conta
+  </ResponseField>
+
+  <ResponseField name="pix_key" type="string">
+    Chave PIX cadastrada
+  </ResponseField>
+
+  <ResponseField name="created_at" type="string" format="date-time">
+    Data de criação
+  </ResponseField>
+
+  <ResponseField name="updated_at" type="string" format="date-time">
+    Data da última atualização
+  </ResponseField>
+</ResponseField>
+
+## Exemplos
+
+**cURL**
+
+```bash
+curl --request POST \
+  --url https://api.seudominio.com/bank-accounts \
+  --header 'X-API-Key: sua-api-key-aqui' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "name": "Minha Conta PIX",
+    "pix_key": "12345678900"
+  }'
+```
+
+**Requisição (JSON)**
+
+```json
+{
+  "name": "Minha Conta PIX",
+  "pix_key": "12345678900"
+}
+```
+
+**Resposta de Sucesso**
+
+```json
+{
+  "success": true,
+  "message": "Bank account created successfully",
+  "data": {
+    "id": 1,
+    "userId": 123,
+    "type": "pix",
+    "name": "Minha Conta PIX",
+    "pix_key": "12345678900",
+    "created_at": "2025-12-23T10:00:00.000Z",
+    "updated_at": "2025-12-23T10:00:00.000Z"
+  }
+}
+```
+
+## Exemplo de Erro Retornado
+
+**Chave PIX duplicada**
+
+```json
+{
+  "statusCode": 409,
+  "message": "Já existe uma conta bancária com esta chave PIX"
+}
+```
+
+**Nome duplicado**
+
+```json
+{
+  "statusCode": 409,
+  "message": "Já existe uma conta bancária com este nome"
+}
+```
+
