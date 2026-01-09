@@ -19,6 +19,24 @@ Retorna todas as contas bancárias cadastradas para o usuário. É necessário o
   </ParamField>
 </ParamField>
 
+<ParamField path="query" type="object">
+  <ParamField path="page" type="string">
+    Número da página (default: "1")
+  </ParamField>
+  <ParamField path="pageSize" type="string">
+    Itens por página (default: "10")
+  </ParamField>
+  <ParamField path="name" type="string">
+    Filtro parcial por nome (case-insensitive)
+  </ParamField>
+  <ParamField path="pix_key" type="string">
+    Filtro parcial por chave PIX (case-insensitive)
+  </ParamField>
+  <ParamField path="type" type="string">
+    Filtro exato por tipo de conta (ex: "pix")
+  </ParamField>
+</ParamField>
+
 ## Resposta
 
 <ResponseField name="success" type="boolean">
@@ -33,17 +51,38 @@ Retorna todas as contas bancárias cadastradas para o usuário. É necessário o
   Lista de contas bancárias
 </ResponseField>
 
+<ResponseField name="pagination" type="object">
+  <ResponseField name="total" type="number">
+    Total de registros
+  </ResponseField>
+  <ResponseField name="page" type="number">
+    Página atual
+  </ResponseField>
+  <ResponseField name="pageSize" type="number">
+    Itens por página
+  </ResponseField>
+  <ResponseField name="totalPages" type="number">
+    Total de páginas
+  </ResponseField>
+  <ResponseField name="hasNextPage" type="boolean">
+    Indica se há próxima página
+  </ResponseField>
+  <ResponseField name="hasPreviousPage" type="boolean">
+    Indica se há página anterior
+  </ResponseField>
+</ResponseField>
+
 ## Exemplos
 
 **cURL**
 
 ```bash
 curl --request GET \
-  --url https://api.seudominio.com/exchange/bank-accounts \
+  --url "https://api.seudominio.com/exchange/bank-accounts?page=1&pageSize=10" \
   --header 'X-API-Key: sua-api-key-aqui'
 ```
 
-**Resposta (200 OK)**
+**Resposta (200 OK com paginação)**
 
 ```json
 {
@@ -58,27 +97,16 @@ curl --request GET \
       "pix_key": "12345678900",
       "created_at": "2025-12-23T10:00:00.000Z",
       "updated_at": "2025-12-23T10:00:00.000Z"
-    },
-    {
-      "id": 2,
-      "userId": 123,
-      "type": "pix",
-      "name": "Conta Secundária",
-      "pix_key": "98765432100",
-      "created_at": "2025-12-23T11:00:00.000Z",
-      "updated_at": "2025-12-23T11:00:00.000Z"
     }
-  ]
-}
-```
-
-**Sem contas**
-
-```json
-{
-  "success": true,
-  "message": "Bank accounts retrieved successfully",
-  "data": []
+  ],
+  "pagination": {
+    "total": 25,
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
 }
 ```
 

@@ -275,6 +275,55 @@
         "operationId": "listBankAccounts",
         "summary": "Listar Contas Bancárias",
         "description": "Lista todas as contas bancárias do usuário",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "1"
+            },
+            "description": "Número da página"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "10"
+            },
+            "description": "Itens por página"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro parcial por nome (case-insensitive)"
+          },
+          {
+            "name": "pix_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro parcial por chave PIX (case-insensitive)"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtro exato por tipo de conta (ex: pix)"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Contas bancárias listadas com sucesso",
@@ -821,7 +870,21 @@
               "$ref": "#/components/schemas/BankAccountResponseDto"
             },
             "description": "Lista de contas bancárias"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationDto"
           }
+        }
+      },
+      "PaginationDto": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "number" },
+          "page": { "type": "number" },
+          "pageSize": { "type": "number" },
+          "totalPages": { "type": "number" },
+          "hasNextPage": { "type": "boolean" },
+          "hasPreviousPage": { "type": "boolean" }
         }
       },
       "PayoutQuoteRequestDto": {
