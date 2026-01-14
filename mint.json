@@ -35,6 +35,8 @@
         "webhooks-advanced",
         "payin",
         "payout",
+        "api-reference/webhook/webhook-payment",
+        "api-reference/webhook/webhook-payout",
         "authentication"
       ]
     },

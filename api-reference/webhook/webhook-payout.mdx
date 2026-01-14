@@ -1,0 +1,143 @@
+---
+title: "Webhook de Payout"
+description: "Notificações em tempo real sobre o status de payout"
+---
+
+## Visão Geral
+
+Receba eventos do fluxo de payout (cripto → BRL via conta PIX cadastrada). Eventos enviados:
+- `crypto.payout.new`
+- `crypto.payout.updated`
+- `crypto.payout.completed`
+
+Todos os timestamps estão em ISO 8601 (UTC). Campos opcionais podem ser `null` ou ausentes. `recipient_tax_id` vem mascarado.
+
+## Eventos
+
+### 1. crypto.payout.new
+Enviado quando um novo payout é criado e está em processamento.
+
+```json
+{
+  "event": "crypto.payout.new",
+  "timestamp": "2026-01-14T00:09:21.240Z",
+  "payout": {
+    "payout_quote_id": "po_uW3NaQ4tRxFG",
+    "sender_wallet_address": "0x141B8DF55816Faee271542516935Cd03A3C8b4E5",
+    "transaction_hash": "0x624684cedfc35602a0237b5846ee798ed2934a750edd235f4f89118e85330a2b",
+    "status": "PROCESSING"
+  },
+  "quote": {
+    "amount_brl": 10.35,
+    "amount_usd": 55.00
+  },
+  "transfer": {
+    "bank": "Stark Bank",
+    "status": "PROCESSING",
+    "recipient_name": "Matheus Silva Souza",
+    "recipient_tax_id": "***.448.926-**"
+  }
+}
+```
+
+### 2. crypto.payout.updated
+Enviado quando há atualização no status ou informações do payout.
+
+```json
+{
+  "event": "crypto.payout.updated",
+  "timestamp": "2026-01-14T00:15:30.500Z",
+  "payout": {
+    "external_id": "po_uW3NaQ4tRxFG",
+    "payout_id": 19,
+    "status": "PROCESSING"
+  },
+  "quote": {
+    "quote_id": 80,
+    "amount_brl": 10.35,
+    "amount_usd": 55.00,
+    "rate": 5.3744,
+    "expires_at": "2026-01-13T22:25:13.285Z"
+  },
+  "transfer": {
+    "tx_hash": "0x624684cedfc35602a0237b5846ee798ed2934a750edd235f4f89118e85330a2b",
+    "network": "Stark Bank",
+    "status": "PROCESSING"
+  }
+}
+```
+
+### 3. crypto.payout.completed
+Enviado quando o payout é concluído.
+
+```json
+{
+  "event": "crypto.payout.completed",
+  "timestamp": "2026-01-14T00:20:31.705Z",
+  "payout": {
+    "payout_quote_id": "po_uW3NaQ4tRxFG",
+    "sender_wallet_address": "0x141B8DF55816Faee271542516935Cd03A3C8b4E5",
+    "transaction_hash": "0x624684cedfc35602a0237b5846ee798ed2934a750edd235f4f89118e85330a2b",
+    "status": "COMPLETED"
+  },
+  "quote": {
+    "amount_brl": 10.35,
+    "amount_usd": 55.00
+  },
+  "transfer": {
+    "bank": "Stark Bank",
+    "status": "COMPLETED",
+    "recipient_name": "Matheus Silva Souza",
+    "recipient_tax_id": "***.448.926-**"
+  }
+}
+```
+
+## Campos (objetos)
+
+### payout
+- `payout_quote_id` (string): ID externo do payout
+- `sender_wallet_address` (string): carteira do remetente
+- `transaction_hash` (string|null): hash on-chain quando disponível
+- `status` (string): PROCESSING, COMPLETED, FAILED
+- `external_id` (string): ID externo (apenas em updated)
+- `payout_id` (number): ID interno (apenas em updated)
+
+### quote
+- `quote_id` (number|undefined): ID da cotação (apenas em updated)
+- `amount_brl` (number|undefined): valor em BRL
+- `amount_usd` (number|undefined): valor em USD
+- `rate` (number|undefined): taxa (apenas em updated)
+- `expires_at` (string|undefined): expiração ISO 8601 (apenas em updated)
+
+### transfer
+- `tx_hash` (string|null): hash da transação (apenas em updated)
+- `network` (string|null): rede/provedor (apenas em updated)
+- `bank` (string|null): banco/provedor (em new/completed)
+- `status` (string|null): PROCESSING, COMPLETED, FAILED
+- `recipient_name` (string|null): nome do destinatário (em new/completed)
+- `recipient_tax_id` (string|null): CPF/CNPJ mascarado (em new/completed)
+
+## Status possíveis
+- PROCESSING: em processamento
+- COMPLETED: concluído
+- FAILED: falhou
+
+## Resposta Esperada
+
+Sua aplicação deve responder com status `200 OK` para indicar que o webhook foi processado com sucesso. Se não recebermos uma resposta `200` dentro de 30 segundos, tentaremos reenviar.
+
+## Tentativas de Reenvio
+
+- **Primeira tentativa**: Imediatamente após o evento  
+- **Segunda tentativa**: 5 segundos depois  
+- **Terceira tentativa**: 15 segundos depois  
+- **Quarta tentativa**: 25 segundos depois  
+
+Após 4 tentativas sem sucesso, o webhook será descartado.
+
+## Boas práticas
+- Responda 200 OK rapidamente para evitar reentregas.
+- Use `payout_id` e `external_id` (quando presentes) para idempotência.
+- Registre `transaction_hash` quando disponível para rastreio on-chain.
+
