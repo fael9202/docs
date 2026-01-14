@@ -76,6 +76,19 @@ Retorna todas as contas bancárias cadastradas para o usuário. É necessário o
 
 **cURL**
 
+### Exemplos de uso
+
+- Sem filtros (página 1, 10 itens):  
+  `GET /exchange/bank-accounts?page=1&pageSize=10`
+
+- Com filtro por nome e tipo (exemplo solicitado):  
+  `GET /exchange/bank-accounts?page=2&pageSize=20&name=Conta&type=pix`
+
+- Filtro por pix_key:  
+  `GET /exchange/bank-accounts?pix_key=12345678900`
+
+**cURL (com paginação)**
+
 ```bash
 curl --request GET \
   --url "https://api.seudominio.com/exchange/bank-accounts?page=1&pageSize=10" \
