@@ -29,14 +29,12 @@
     {
       "group": "Início",
       "pages": [
-  "introduction",
+        "introduction",
         "getting-started",
         "integration-guide",
         "webhooks-advanced",
         "payin",
         "payout",
-        "api-reference/webhook/webhook-payment",
-        "api-reference/webhook/webhook-payout",
         "authentication"
       ]
     },
@@ -82,7 +80,8 @@
     {
       "group": "Webhooks",
       "pages": [
-        "api-reference/webhook/webhook-payment"
+        "api-reference/webhook/webhook-payment",
+        "api-reference/webhook/webhook-payout"
       ]
     }
   ]
