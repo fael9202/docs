@@ -641,6 +641,10 @@
             "type": "string",
             "enum": ["sender", "receiver"],
             "description": "Define se request_amount representa o valor que o pagador envia (sender) ou o valor que o recebedor deve receber (receiver)"
+          },
+          "cover_fees": {
+            "type": "boolean",
+            "description": "Indica se as taxas cobradas no pagamento gerado devem ser cobertas (incluídas no valor)"
           }
         }
       },

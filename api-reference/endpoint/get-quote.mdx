@@ -41,6 +41,10 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
       Define se o `request_amount` é o valor enviado pelo pagador (`sender`) ou o valor que o recebedor deve receber (`receiver`).
     </ParamField>
 
+    <ParamField path="cover_fees" type="boolean">
+      Indica se as taxas cobradas no pagamento gerado devem ser cobertas (incluídas no valor).
+    </ParamField>
+
   </Expandable>
 </ParamField>
 
@@ -126,7 +130,8 @@ Cria uma cotação para conversão de BRL para criptomoeda. A cotação inclui i
   "token": "USDT",
   "request_amount": 60,
   "address": "0x7e4bb73735f7cc10c07f7b2541d695b79bd831a0",
-  "currency_type": "sender"
+  "currency_type": "sender",
+  "cover_fees": true
 }
 ```
 
