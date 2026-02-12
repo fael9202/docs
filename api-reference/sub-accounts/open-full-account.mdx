@@ -1,0 +1,124 @@
+---
+title: 'Abrir Conta Completa'
+openapi: 'POST /sub-accounts/open-full-account'
+---
+
+## Abertura de Conta Completa
+
+Inicia o processo de abertura de conta completa.
+
+### Headers
+
+<ParamField path="api_key" type="string" required>
+  Chave de API da subconta
+</ParamField>
+
+<ParamField path="api_secret" type="string" required>
+  Secret de API da subconta
+</ParamField>
+
+<ParamField path="Content-Type" type="string" required>
+  application/json
+</ParamField>
+
+### Body
+
+```json
+{}
+```
+
+### Pré-requisitos
+
+Antes de chamar este endpoint, certifique-se de que:
+
+<Steps>
+  <Step title="Subconta Criada">
+    A subconta deve ter sido criada com sucesso usando `POST /sub-accounts`
+  </Step>
+  <Step title="Documentos Enviados">
+    Todos os documentos obrigatórios devem ter sido enviados
+  </Step>
+  <Step title="Dados Validados">
+    Todos os dados da empresa e representante devem estar válidos
+  </Step>
+</Steps>
+
+### Resposta de Sucesso (201)
+
+```json
+{
+  "status": "success",
+  "message": "Conta em analise."
+}
+```
+
+### Resposta de Erro (500)
+
+```json
+{
+  "message": "Erro ao enviar os dados.",
+  "statusCode": 500
+}
+```
+
+### Status da Conta
+
+Após chamar este endpoint, a conta passará pelos seguintes status:
+
+<AccordionGroup>
+  <Accordion title="PENDING">
+    Conta criada e aguardando análise
+  </Accordion>
+  <Accordion title="UNDER_REVIEW">
+    Documentos sendo analisados pelo processador
+  </Accordion>
+  <Accordion title="APPROVED">
+    Conta aprovada e ativa
+  </Accordion>
+  <Accordion title="REJECTED">
+    Conta rejeitada - verificar documentos
+  </Accordion>
+</AccordionGroup>
+
+### Características
+
+- ✅ **Processo assíncrono**: Conta fica em análise
+- ✅ **Validação de documentos**: Verifica documentos obrigatórios
+- ✅ **Tratamento de erros**: Retorna erro específico se CNPJ inválido
+
+### Possíveis Erros
+
+<AccordionGroup>
+  <Accordion title="401 - Unauthorized">
+    ```json
+    {
+      "message": "Api Key não encontrada.",
+      "statusCode": 401
+    }
+    ```
+  </Accordion>
+  <Accordion title="404 - Not Found">
+    ```json
+    {
+      "message": "Subconta não encontrada.",
+      "statusCode": 404
+    }
+    ```
+  </Accordion>
+  <Accordion title="422 - Unprocessable Entity">
+    ```json
+    {
+      "message": "Documentos obrigatórios não enviados.",
+      "statusCode": 422
+    }
+    ```
+  </Accordion>
+  <Accordion title="500 - Internal Server Error">
+    ```json
+    {
+      "message": "Erro ao registrar conta.",
+      "statusCode": 500
+    }
+    ```
+  </Accordion>
+</AccordionGroup>

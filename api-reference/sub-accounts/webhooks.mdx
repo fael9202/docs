@@ -1,0 +1,40 @@
+---
+title: 'Webhooks de Sub-accounts'
+---
+
+## Visão geral
+Enviamos webhooks sempre que o processo de KYC da subconta é concluído. Os eventos são disparados imediatamente após a decisão (aprovação ou rejeição) e chegam via POST na `callback_url` configurada para webhooks de subcontas.
+
+- `timestamp`: momento em que o evento foi gerado (UTC).
+- `user`: dados básicos da subconta impactada (id, nome, email, documento).
+
+## Eventos
+
+### kyc.approved
+Enviado quando o KYC da subconta é aprovado.
+```json
+{
+  "event": "kyc.approved",
+  "timestamp": "2026-01-15T21:06:03.628Z",
+  "user": {
+    "name": "joao gomes",
+    "email": "teste@email.com",
+    "document": "1111111113"
+  }
+}
+```
+
+### kyc.rejected
+Enviado quando o KYC da subconta é rejeitado.
+```json
+{
+  "event": "kyc.rejected",
+  "timestamp": "2026-01-15T21:08:07.876Z",
+  "user": {
+    "name": "joao gomes",
+    "email": "teste@email.com",
+    "document": "1111111113"
+  }
+}
+```
+

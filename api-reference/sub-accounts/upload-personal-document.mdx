@@ -1,0 +1,102 @@
+---
+title: 'Upload Documento Pessoal'
+openapi: 'POST /sub-accounts/document'
+---
+
+## Upload de Documento Pessoal
+
+Faz upload de documentos pessoais da subconta (RG, CNH, Selfie).
+
+### Headers
+
+<ParamField path="api_key" type="string" required>
+  Chave de API da subconta
+</ParamField>
+
+<ParamField path="api_secret" type="string" required>
+  Secret de API da subconta
+</ParamField>
+
+<ParamField path="Content-Type" type="string" required>
+  multipart/form-data
+</ParamField>
+
+### Body (Form Data)
+
+<ParamField path="documentType" type="string" required>
+  Tipo do documento (RG_FRONT, RG_BACK, CNH_FRONT, CNH_BACK, SELFIE)
+</ParamField>
+
+<ParamField path="file" type="File" required>
+  Arquivo JPG, JPEG, PNG, GIF, WEBP ou PDF (máximo 10MB)
+</ParamField>
+
+### Tipos de Documento Aceitos
+
+<AccordionGroup>
+  <Accordion title="RG_FRONT">
+    RG Frente - Documento de identidade (lado da foto)
+  </Accordion>
+  <Accordion title="RG_BACK">
+    RG Verso - Documento de identidade (lado dos dados)
+  </Accordion>
+  <Accordion title="CNH_FRONT">
+    CNH Frente - Carteira de habilitação (lado da foto)
+  </Accordion>
+  <Accordion title="CNH_BACK">
+    CNH Verso - Carteira de habilitação (lado dos dados)
+  </Accordion>
+  <Accordion title="SELFIE">
+    Selfie do sócio para verificação facial
+  </Accordion>
+</AccordionGroup>
+
+### Resposta de Sucesso (201)
+
+```json
+{
+  "status": "success",
+  "message": "Documento enviado com sucesso.",
+  "data": {
+    "filename": "rg_frente.jpg",
+    "document_type": "RG_FRONT",
+    "document_format": "JPG"
+  }
+}
+```
+
+### Validações
+
+- ✅ **Tamanho máximo**: 10MB
+- ✅ **Tipo obrigatório**: Deve especificar o tipo do documento
+- ✅ **Arquivo obrigatório**: Deve enviar um arquivo
+- ✅ **Autenticação**: Usa credenciais da própria subconta
+
+### Possíveis Erros
+
+<AccordionGroup>
+  <Accordion title="400 - Bad Request">
+    ```json
+    {
+      "message": "Tipo de documento inválido.",
+      "statusCode": 400
+    }
+    ```
+  </Accordion>
+  <Accordion title="401 - Unauthorized">
+    ```json
+    {
+      "message": "Api Key não encontrada.",
+      "statusCode": 401
+    }
+    ```
+  </Accordion>
+  <Accordion title="413 - Payload Too Large">
+    ```json
+    {
+      "message": "Arquivo muito grande. Máximo 10MB.",
+      "statusCode": 413
+    }
+    ```
+  </Accordion>
+</AccordionGroup>

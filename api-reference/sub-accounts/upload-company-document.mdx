@@ -1,0 +1,96 @@
+---
+title: 'Upload Documento Empresa'
+openapi: 'POST /sub-accounts/document/company'
+---
+
+## Upload de Documento Empresa
+
+Faz upload de documentos da empresa (Contrato Social).
+
+### Headers
+
+<ParamField path="api_key" type="string" required>
+  Chave de API da subconta
+</ParamField>
+
+<ParamField path="api_secret" type="string" required>
+  Secret de API da subconta
+</ParamField>
+
+<ParamField path="Content-Type" type="string" required>
+  multipart/form-data
+</ParamField>
+
+### Body (Form Data)
+
+<ParamField path="documentType" type="string" required>
+  Tipo do documento (PROOF_OF_RESIDENCE, CNPJ, SOCIAL_CONTRACT)
+</ParamField>
+
+<ParamField path="file" type="File" required>
+  Arquivo JPG, JPEG, PNG, GIF, WEBP ou PDF (máximo 10MB)
+</ParamField>
+
+### Tipos de Documento Empresarial Aceitos
+
+<AccordionGroup>
+  <Accordion title="PROOF_OF_RESIDENCE">
+    Comprovante de Endereço
+  </Accordion>
+  <Accordion title="CNPJ">
+    CNPJ da empresa
+  </Accordion>
+  <Accordion title="SOCIAL_CONTRACT">
+    Contrato Social da empresa
+  </Accordion>
+</AccordionGroup>
+
+### Resposta de Sucesso (201)
+
+```json
+{
+  "status": "success",
+  "message": "Documento da empresa enviado com sucesso.",
+  "data": {
+    "filename": "contrato-social.pdf",
+    "document_type": "SOCIAL_CONTRACT",
+    "document_format": "PDF"
+  }
+}
+```
+
+### Validações
+
+- ✅ **Tamanho máximo**: 10MB
+- ✅ **Tipo obrigatório**: Deve especificar o tipo do documento
+- ✅ **Arquivo obrigatório**: Deve enviar um arquivo
+- ✅ **Autenticação**: Usa credenciais da própria subconta
+
+### Possíveis Erros
+
+<AccordionGroup>
+  <Accordion title="400 - Bad Request">
+    ```json
+    {
+      "message": "Tipo de documento inválido.",
+      "statusCode": 400
+    }
+    ```
+  </Accordion>
+  <Accordion title="401 - Unauthorized">
+    ```json
+    {
+      "message": "Api Key não encontrada.",
+      "statusCode": 401
+    }
+    ```
+  </Accordion>
+  <Accordion title="413 - Payload Too Large">
+    ```json
+    {
+      "message": "Arquivo muito grande. Máximo 10MB.",
+      "statusCode": 413
+    }
+    ```
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,166 @@
+---
+title: 'Criar Subconta'
+openapi: 'POST /sub-accounts'
+---
+
+## Criação de Subconta
+
+Cria uma nova subconta completa, incluindo usuário e informações da empresa.
+
+### Headers
+
+<ParamField path="api_key" type="string" required>
+  Chave de API do usuário
+</ParamField>
+
+<ParamField path="api_secret" type="string" required>
+  Secret de API do usuário
+</ParamField>
+
+<ParamField path="Content-Type" type="string" required>
+  application/json
+</ParamField>
+
+### Body
+
+<ParamField path="company_infos" type="object" required>
+  Informações da empresa
+</ParamField>
+
+<ParamField path="company_infos.cnpj" type="string" required>
+  CNPJ da empresa (formato: 12345678000195)
+</ParamField>
+
+<ParamField path="company_infos.company_name" type="string" required>
+  Razão social da empresa
+</ParamField>
+
+<ParamField path="company_infos.trade_name" type="string" required>
+  Nome fantasia da empresa
+</ParamField>
+
+<ParamField path="company_infos.company_type" type="string" required>
+  Tipo da empresa (ex: LTDA, S.A., etc.)
+</ParamField>
+
+<ParamField path="company_infos.constitution_date" type="string" required>
+  Data de constituição (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField path="company_infos.monthly_income" type="number" required>
+  Renda mensal da empresa
+</ParamField>
+
+<ParamField path="representative" type="object" required>
+  Informações do representante legal
+</ParamField>
+
+<ParamField path="representative.name" type="string" required>
+  Nome do representante
+</ParamField>
+
+<ParamField path="representative.email" type="string" required>
+  Email do representante
+</ParamField>
+
+<ParamField path="representative.cpf" type="string" required>
+  CPF do representante
+</ParamField>
+
+<ParamField path="representative.full_name" type="string" required>
+  Nome completo do representante
+</ParamField>
+
+<ParamField path="representative.phone" type="string" required>
+  Telefone do representante
+</ParamField>
+
+<ParamField path="representative.mother_name" type="string" required>
+  Nome da mãe do representante
+</ParamField>
+
+<ParamField path="representative.monthly_income" type="string" required>
+  Renda mensal do representante
+</ParamField>
+
+<ParamField path="representative.birth_date" type="string" required>
+  Data de nascimento (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField path="representative.was_signed" type="boolean" required>
+  Se o representante já assinou os documentos
+</ParamField>
+
+<ParamField path="representative.signature_date" type="string" required>
+  Data da assinatura (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField path="address" type="object" required>
+  Endereço da empresa
+</ParamField>
+
+<ParamField path="address.street" type="string" required>
+  Rua/Logradouro
+</ParamField>
+
+<ParamField path="address.number" type="string" required>
+  Número
+</ParamField>
+
+<ParamField path="address.city" type="string" required>
+  Cidade
+</ParamField>
+
+<ParamField path="address.zip_code" type="string" required>
+  CEP
+</ParamField>
+
+<ParamField path="address.neighborhood" type="string" required>
+  Bairro
+</ParamField>
+
+<ParamField path="address.uf" type="string" required>
+  UF (Estado)
+</ParamField>
+
+<ParamField path="address.adress_type" type="number" required>
+  Tipo de endereço
+</ParamField>
+
+<ParamField path="ref" type="string">
+  Referência opcional para identificação
+</ParamField>
+
+### Resposta de Sucesso (201)
+
+```json
+{
+  "status": "success",
+  "account": {
+    "name": "Empresa Exemplo LTDA",
+    "document": "12345678000195",
+    "status": "PENDING",
+    "secrets": {
+      "api_key": "ak_1234567890abcdef",
+      "api_secret": "as_1234567890abcdef"
+    }
+  }
+}
+```
+
+### Possíveis Erros
+
+<AccordionGroup>
+  <Accordion title="400 - Bad Request">
+    Dados inválidos ou campos obrigatórios não preenchidos
+  </Accordion>
+  <Accordion title="401 - Unauthorized">
+    Api Key não encontrada ou inválida
+  </Accordion>
+  <Accordion title="409 - Conflict">
+    Email já cadastrado no sistema
+  </Accordion>
+  <Accordion title="500 - Internal Server Error">
+    Erro interno do servidor durante a criação
+  </Accordion>
+</AccordionGroup>

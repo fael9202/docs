@@ -78,6 +78,15 @@
       ]
     },
     {
+      "group": "Sub-accounts",
+      "pages": [
+        "api-reference/sub-accounts/create-sub-account",
+        "api-reference/sub-accounts/upload-personal-document",
+        "api-reference/sub-accounts/upload-company-document",
+        "api-reference/sub-accounts/open-full-account"
+      ]
+    },
+    {
       "group": "Webhooks",
       "pages": [
         "api-reference/webhook/webhook-payment",
