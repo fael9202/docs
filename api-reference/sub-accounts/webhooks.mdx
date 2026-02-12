@@ -1,17 +1,26 @@
 ---
-title: 'Webhooks de Sub-accounts'
+title: "Webhooks de Sub-accounts"
+description: "Notificações quando o processo de KYC da subconta é concluído (aprovado ou rejeitado)"
 ---
 
-## Visão geral
-Enviamos webhooks sempre que o processo de KYC da subconta é concluído. Os eventos são disparados imediatamente após a decisão (aprovação ou rejeição) e chegam via POST na `callback_url` configurada para webhooks de subcontas.
+## Visão Geral
 
-- `timestamp`: momento em que o evento foi gerado (UTC).
-- `user`: dados básicos da subconta impactada (id, nome, email, documento).
+Enviamos webhooks sempre que o processo de KYC da subconta é concluído. Os eventos são disparados imediatamente após a decisão (aprovação ou rejeição) e chegam via **POST** na `callback_url` configurada para webhooks de subcontas.
+
+### Campos comuns no payload
+
+| Campo | Descrição |
+|-------|-----------|
+| `event` | Nome do evento (`kyc.approved` ou `kyc.rejected`) |
+| `timestamp` | Momento em que o evento foi gerado (UTC), formato ISO 8601 |
+| `user` | Dados básicos da subconta impactada: nome, email, documento (CPF/CNPJ) |
 
 ## Eventos
 
 ### kyc.approved
-Enviado quando o KYC da subconta é aprovado.
+
+Enviado quando o KYC da subconta é **aprovado**.
+
 ```json
 {
   "event": "kyc.approved",
@@ -25,7 +34,9 @@ Enviado quando o KYC da subconta é aprovado.
 ```
 
 ### kyc.rejected
-Enviado quando o KYC da subconta é rejeitado.
+
+Enviado quando o KYC da subconta é **rejeitado**.
+
 ```json
 {
   "event": "kyc.rejected",

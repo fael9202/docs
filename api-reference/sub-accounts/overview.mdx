@@ -1,0 +1,37 @@
+---
+title: "Sub-accounts API"
+description: "Visão geral da API de subcontas BaaS (Banking as a Service)"
+---
+
+## Visão Geral
+
+A API de **Sub-accounts** permite criar e gerenciar subcontas em modo BaaS (Banking as a Service). Com ela você pode:
+
+- **Criar subcontas** com dados da empresa, representante e endereço
+- **Enviar documentos** pessoais (RG, CNH, Selfie) e da empresa (Comprovante de Endereço, CNPJ, Contrato Social)
+- **Abrir conta completa** e acompanhar o processo de KYC
+- **Receber webhooks** quando o KYC for aprovado ou rejeitado
+
+<Note>
+  As rotas de Sub-accounts utilizam o mesmo endpoint base e autenticação da API (headers `api_key` e `api_secret`). As credenciais estão em [Configurações → Credenciais de API](https://app.3xpay.co) no painel.
+</Note>
+
+## Fluxo resumido
+
+1. **Criar subconta** — `POST /sub-accounts` com dados da empresa, representante e endereço
+2. **Upload de documentos** — Documentos pessoais em `/sub-accounts/document` e da empresa em `/sub-accounts/document/company`
+3. **Abrir conta** — `POST /sub-accounts/open-full-account` para iniciar a análise
+4. **Webhooks** — Configure uma `callback_url` para receber eventos `kyc.approved` e `kyc.rejected`
+
+## Endpoints
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/sub-accounts` | Criar subconta |
+| POST | `/sub-accounts/document` | Upload documento pessoal (RG, CNH, Selfie) |
+| POST | `/sub-accounts/document/company` | Upload documento empresa (Comprovante, CNPJ, Contrato Social) |
+| POST | `/sub-accounts/open-full-account` | Abrir conta completa (inicia análise KYC) |
+
+## Webhooks
+
+Os eventos de KYC são enviados via POST na URL configurada para webhooks de subcontas. Veja a documentação completa em [Webhooks de Sub-accounts](/api-reference/sub-accounts/webhooks).
