@@ -89,10 +89,21 @@
       ]
     },
     {
+      "group": "Contestação de MED",
+      "pages": [
+        "api-reference/med-contest/overview",
+        "api-reference/med-contest/create-med-contest",
+        "api-reference/med-contest/list-med-contests",
+        "api-reference/med-contest/get-med-contest",
+        "api-reference/med-contest/submit-med-evidence"
+      ]
+    },
+    {
       "group": "Webhooks",
       "pages": [
         "api-reference/webhook/webhook-payment",
-        "api-reference/webhook/webhook-payout"
+        "api-reference/webhook/webhook-payout",
+        "api-reference/webhook/webhook-infraction"
       ]
     }
   ]

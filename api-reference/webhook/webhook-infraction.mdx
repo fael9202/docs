@@ -34,10 +34,19 @@ O webhook envia um payload JSON contendo os detalhes da infração e da transaç
 - `transactionType` (string): Tipo da transação, neste caso "CASH_IN"
 - `value` (string): Valor da transação
 - `externalId` (string): ID de referência externa fornecido pelo cliente
+- `e2e_id` (string): End-to-End ID da transação PIX original
 - `medStatus` (string): Status do MED. Valores possíveis:
-  - `ACKNOWLEDGED`: Quando a solicitação do MED é recebida
-  - `CANCELLED`: Quando o MED é cancelado e o valor estornado para conta
-  - `DEBITED`:  Quando a defesa do MED não é aceita e o valor enviado para o cliente.
+  - `ACKNOWLEDGED`: Solicitação do MED foi recebida (evento inicial). A partir daqui, o parceiro pode abrir a disputa via [POST /med-contest/exposes](/api-reference/med-contest/create-med-contest).
+  - `DEFENSE_SUBMITTED`: Defesa entregue ao PSP com sucesso, logo após o [PATCH /med-contest/exposes/:medId](/api-reference/med-contest/submit-med-evidence).
+  - `APPROVED`: PSP aceitou a defesa — valor permanece com o parceiro.
+  - `REJECTED`: PSP rejeitou a defesa — estorno será realizado em favor do reclamante.
+  - `REFUNDED`: Estorno efetivamente devolvido ao reclamante (pode chegar junto ou após `REJECTED`).
+  - `CANCELLED`: MED cancelado e valor estornado para a conta do parceiro.
+  - `DEBITED` *(legado)*: Defesa do MED não aceita e valor enviado para o cliente. Equivalente ao fluxo atual `REJECTED` + `REFUNDED`.
+
+<Note>
+  Para responder a uma solicitação de MED via API (sem acessar o painel), consulte os endpoints em [Contestação de MED](/api-reference/med-contest/overview).
+</Note>
 
 ## Boas Práticas
 

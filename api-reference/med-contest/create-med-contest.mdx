@@ -1,0 +1,131 @@
+---
+title: "Abrir Disputa de MED"
+description: "Cria o registro inicial da contestação de MED a partir do UUID da transação"
+---
+
+## Visão Geral
+
+Cria o registro inicial da contestação. Após esta chamada, o status fica em `WAITING_CONTENT` aguardando o upload da evidência via [PATCH /med-contest/exposes/:medId](/api-reference/med-contest/submit-med-evidence).
+
+<Note>
+  A diferença-chave em relação ao endpoint JWT é que o parceiro envia o **UUID da transação** (`transactionId` recebido no webhook), não o ID numérico interno.
+</Note>
+
+## Endpoint
+
+```http
+POST /med-contest/exposes
+```
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="api_key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="api_secret" type="string" required>
+    Secret de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string" required>
+    application/json
+  </ParamField>
+</ParamField>
+
+<ParamField path="body" type="object">
+  <ParamField path="transaction_id" type="string" required>
+    UUID da transação contestada (campo `transactionId` recebido no webhook de infração).
+  </ParamField>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="id" type="number">
+  ID interno do registro de MED. **É o `medId` usado nos próximos endpoints.**
+</ResponseField>
+
+<ResponseField name="transactionId" type="number">
+  ID interno da transação associada.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Status inicial da disputa. Sempre `WAITING_CONTENT` ao criar.
+</ResponseField>
+
+<ResponseField name="content" type="string">
+  URL da evidência (preenchido após o `PATCH`). `null` na criação.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Descrição da evidência (preenchida após o `PATCH`). `null` na criação.
+</ResponseField>
+
+<ResponseField name="external_med_id" type="string">
+  ID da disputa no PSP upstream (preenchido após envio da defesa).
+</ResponseField>
+
+<ResponseField name="processor_name" type="string">
+  Nome do PSP que está processando a disputa (ex.: `woovi`).
+</ResponseField>
+
+<ResponseField name="retry_count" type="number">
+  Número de tentativas de envio da defesa ao PSP.
+</ResponseField>
+
+<ResponseField name="last_error" type="string">
+  Detalhes do último erro de transporte, quando aplicável.
+</ResponseField>
+
+## Exemplo
+
+**cURL**
+
+```bash
+curl --request POST \
+  --url https://gateway.3xpay.co/med-contest/exposes \
+  --header 'api_key: sua-api-key' \
+  --header 'api_secret: seu-api-secret' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "transaction_id": "01a51b3e-e17d-45eb-b8a2-e2392b6b1b28"
+  }'
+```
+
+**Request Body**
+
+```json
+{
+  "transaction_id": "01a51b3e-e17d-45eb-b8a2-e2392b6b1b28"
+}
+```
+
+**Resposta (201 Created)**
+
+```json
+{
+  "id": 1024,
+  "transactionId": 50231,
+  "status": "WAITING_CONTENT",
+  "content": null,
+  "description": null,
+  "external_med_id": null,
+  "processor_name": null,
+  "retry_count": 0,
+  "last_error": null,
+  "created_at": "2026-05-12T10:30:00.000Z",
+  "updated_at": "2026-05-12T10:30:00.000Z"
+}
+```
+
+## Erros Possíveis
+
+<AccordionGroup>
+  <Accordion title="400 - transaction_id deve ser um UUID válido">
+    O `transaction_id` enviado não está em formato UUID.
+  </Accordion>
+  <Accordion title="400 - Disputa já existente">
+    Já existe uma disputa para essa transação. Use [GET /med-contest/exposes/:medId](/api-reference/med-contest/get-med-contest) para recuperar o registro existente.
+  </Accordion>
+  <Accordion title="404 - Transação não encontrada para sua conta">
+    O UUID informado não pertence ao parceiro autenticado.
+  </Accordion>
+</AccordionGroup>

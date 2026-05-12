@@ -1,0 +1,129 @@
+---
+title: "Listar Disputas de MED"
+description: "Lista paginada de todas as disputas de MED da conta autenticada"
+---
+
+## Visão Geral
+
+Lista paginada de todas as disputas de MED da conta autenticada, com suporte a filtros por status e datas.
+
+## Endpoint
+
+```http
+GET /med-contest/exposes
+```
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="api_key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="api_secret" type="string" required>
+    Secret de API para autenticação
+  </ParamField>
+</ParamField>
+
+<ParamField path="query" type="object">
+  <ParamField path="page" type="string" default="1">
+    Página.
+  </ParamField>
+  <ParamField path="pageSize" type="string" default="10">
+    Itens por página.
+  </ParamField>
+  <ParamField path="status" type="string">
+    Filtra por status do MED. Valores: `WAITING_CONTENT`, `REQUESTED`, `DEFENSE_SUBMITTED`, `DEFENSE_FAILED`, `APPROVED`, `REJECTED`, `REFUNDED`, `CANCELLED`.
+  </ParamField>
+  <ParamField path="created_at" type="string">
+    Filtra por data de criação (ISO date).
+  </ParamField>
+  <ParamField path="updated_at" type="string">
+    Filtra por data de atualização (ISO date).
+  </ParamField>
+</ParamField>
+
+## Resposta
+
+<ResponseField name="medsContest" type="array">
+  Lista de transações em disputa de MED. Cada item contém os campos da transação e um objeto aninhado `MedContest` com os dados da disputa.
+</ResponseField>
+
+<ResponseField name="total" type="number">
+  Total de registros.
+</ResponseField>
+
+<ResponseField name="totalPages" type="number">
+  Total de páginas.
+</ResponseField>
+
+<ResponseField name="currentPage" type="number">
+  Página atual.
+</ResponseField>
+
+<ResponseField name="nextPage" type="number">
+  Próxima página, ou `null`.
+</ResponseField>
+
+<ResponseField name="prevPage" type="number">
+  Página anterior, ou `null`.
+</ResponseField>
+
+<ResponseField name="pageSize" type="number">
+  Itens por página.
+</ResponseField>
+
+## Exemplo
+
+**cURL**
+
+```bash
+curl --request GET \
+  --url "https://gateway.3xpay.co/med-contest/exposes?page=1&pageSize=20&status=DEFENSE_SUBMITTED" \
+  --header 'api_key: sua-api-key' \
+  --header 'api_secret: seu-api-secret'
+```
+
+**Resposta (200 OK)**
+
+```json
+{
+  "medsContest": [
+    {
+      "id": 50231,
+      "transactionId": "01a51b3e-e17d-45eb-b8a2-e2392b6b1b28",
+      "order_processor_id": "ORDER-XPTO-99",
+      "status": "MED",
+      "external_id": "PARTNER-REF-001",
+      "created_at": "2026-05-10T13:22:11.000Z",
+      "updated_at": "2026-05-11T09:14:02.000Z",
+      "user": { "name": "Parceiro X" },
+      "MedContest": {
+        "id": 1024,
+        "status": "DEFENSE_SUBMITTED",
+        "content": "https://s3...",
+        "description": "Comprovante de pagamento original.",
+        "external_med_id": "dispute_8f3a...",
+        "processor_name": "woovi",
+        "retry_count": 1,
+        "last_error": null,
+        "created_at": "2026-05-10T13:30:00.000Z",
+        "updated_at": "2026-05-10T13:32:00.000Z"
+      }
+    }
+  ],
+  "total": 1,
+  "totalPages": 1,
+  "currentPage": 1,
+  "nextPage": null,
+  "prevPage": null,
+  "pageSize": 20
+}
+```
+
+## Erros Possíveis
+
+<AccordionGroup>
+  <Accordion title="404 - Nenhuma disputa de MED encontrada">
+    A conta não possui disputas de MED que atendam aos filtros aplicados.
+  </Accordion>
+</AccordionGroup>

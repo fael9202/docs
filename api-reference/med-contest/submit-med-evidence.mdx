@@ -1,0 +1,152 @@
+---
+title: "Enviar Evidência da Disputa"
+description: "Anexa arquivo e descrição à disputa, e dispara o envio da defesa ao PSP"
+---
+
+## Visão Geral
+
+Anexa um arquivo de evidência (PDF, imagem, etc.) e uma descrição à disputa. Internamente, dispara o envio da defesa ao PSP upstream (hoje suportado: **Woovi**).
+
+<Note>
+  O endpoint é idempotente do ponto de vista do registro (atualiza o mesmo `medId`), mas **pode ser chamado mais de uma vez** para anexar evidências adicionais — a última prevalece no campo `content`.
+</Note>
+
+## Endpoint
+
+```http
+PATCH /med-contest/exposes/:medId
+```
+
+## Parâmetros
+
+<ParamField path="headers" type="object">
+  <ParamField path="api_key" type="string" required>
+    Chave de API para autenticação
+  </ParamField>
+  <ParamField path="api_secret" type="string" required>
+    Secret de API para autenticação
+  </ParamField>
+  <ParamField path="Content-Type" type="string" required>
+    multipart/form-data
+  </ParamField>
+</ParamField>
+
+<ParamField path="path.medId" type="integer" required>
+  ID da disputa retornado por [POST /med-contest/exposes](/api-reference/med-contest/create-med-contest).
+</ParamField>
+
+### Body (multipart/form-data)
+
+<ParamField path="file" type="binary" required>
+  Documento de evidência (PDF, imagem, etc.). **Tamanho máximo: 10 MB.**
+</ParamField>
+
+<ParamField path="description" type="string" required>
+  Descrição da evidência. Máximo de 2000 caracteres.
+</ParamField>
+
+## Resposta
+
+<ResponseField name="id" type="number">
+  ID da disputa.
+</ResponseField>
+
+<ResponseField name="transactionId" type="number">
+  ID interno da transação associada.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Status final após o envio. Veja a tabela abaixo.
+</ResponseField>
+
+<ResponseField name="content" type="string">
+  URL pública (S3) do arquivo enviado.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Descrição enviada.
+</ResponseField>
+
+<ResponseField name="external_med_id" type="string">
+  ID da disputa no PSP upstream.
+</ResponseField>
+
+<ResponseField name="processor_name" type="string">
+  Nome do PSP (ex.: `woovi`).
+</ResponseField>
+
+<ResponseField name="retry_count" type="number">
+  Número de tentativas de envio da defesa ao PSP.
+</ResponseField>
+
+<ResponseField name="last_error" type="string">
+  Detalhes do último erro de transporte, quando aplicável.
+</ResponseField>
+
+### Status final possíveis
+
+| Status              | Significado                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `DEFENSE_SUBMITTED` | Defesa entregue ao PSP com sucesso (caminho feliz).                                                                    |
+| `DEFENSE_FAILED`    | PSP rejeitou o envio (erro de transporte/4xx). Detalhes em `last_error`. O parceiro pode chamar o `PATCH` novamente.   |
+| `REQUESTED`         | PSP da transação não tem caminho server-to-server suportado ainda (apenas Woovi). O time interno é notificado por e-mail e acompanha manualmente. |
+
+## Exemplo
+
+**cURL**
+
+```bash
+curl --request PATCH \
+  --url https://gateway.3xpay.co/med-contest/exposes/1024 \
+  --header 'api_key: sua-api-key' \
+  --header 'api_secret: seu-api-secret' \
+  -F "file=@/caminho/comprovante.pdf" \
+  -F "description=Comprovante de pagamento original emitido pelo nosso PSP."
+```
+
+**Resposta (200 OK)**
+
+```json
+{
+  "id": 1024,
+  "transactionId": 50231,
+  "status": "DEFENSE_SUBMITTED",
+  "content": "https://s3.../comprovante.pdf",
+  "description": "Comprovante de pagamento original.",
+  "external_med_id": "dispute_8f3a...",
+  "processor_name": "woovi",
+  "retry_count": 1,
+  "last_error": null
+}
+```
+
+## Erros Possíveis
+
+<AccordionGroup>
+  <Accordion title="400 - Descrição é obrigatória">
+    O campo `description` não foi enviado no `multipart/form-data`.
+  </Accordion>
+  <Accordion title="400 - Descrição deve ter no máximo 2000 caracteres">
+    O campo `description` ultrapassou o limite de 2000 caracteres.
+  </Accordion>
+  <Accordion title="400 - Arquivo muito grande (máximo 10MB)">
+    O arquivo enviado excedeu 10 MB.
+  </Accordion>
+  <Accordion title="404 - Disputa de MED não encontrada">
+    Não existe disputa com esse `medId` para a conta autenticada.
+  </Accordion>
+</AccordionGroup>
+
+## Resolução final via webhook
+
+Após `DEFENSE_SUBMITTED`, a resolução final chega via webhook de infração com o campo `medStatus`:
+
+| `medStatus`         | Quando ocorre                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `DEFENSE_SUBMITTED` | Defesa entregue ao PSP com sucesso (logo após o `PATCH`).                           |
+| `APPROVED`          | PSP aceitou a defesa — valor permanece com o parceiro.                              |
+| `REJECTED`          | PSP rejeitou a defesa — estorno realizado em favor do reclamante.                   |
+| `REFUNDED`          | Estorno efetivamente devolvido ao reclamante (pode chegar junto ou após `REJECTED`). |
+| `CANCELLED`         | MED cancelado.                                                                      |
+
+Veja a documentação completa em [Webhook de Infração](/api-reference/webhook/webhook-infraction).
